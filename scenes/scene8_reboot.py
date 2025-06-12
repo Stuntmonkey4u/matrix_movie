@@ -16,7 +16,7 @@ from utils import renderer # Updated path
 
 console = renderer.get_console()
 
-def play_scene():
+def play_scene(paging_enabled: bool): # Added paging_enabled argument
     renderer.clear_screen()
 
     renderer.typing_print("[SYSTEM_CORE] Emergency reboot sequence initiated by ANALYST_AI_CORE_WATCHDOG...", style="bold red", delay=0.03)
@@ -36,6 +36,7 @@ def play_scene():
     for service in services_to_shutdown:
         renderer.typing_print(f"  {service}", style="dim red", delay=0.01, new_line_delay=0.1)
         time.sleep(random.uniform(0.1, 0.25))
+    renderer.conditional_paging_prompt(console, paging_enabled, "Press Enter after services shutdown...")
 
     time.sleep(1)
     renderer.typing_print("\n[SYSTEM_CORE] Power cycling reality grid. This might sting a bit.", style="bold yellow", new_line_delay=0.5)
@@ -58,13 +59,14 @@ def play_scene():
     renderer.typing_print("[BIOS]   REALITY_IO_SUBSYSTEM: OK", style="dim white")
     renderer.typing_print("[BIOS]   SENTIENT_INTERFACE_CARD: DETECTED (STATUS: AWAKENED?)", style="bold yellow")
     time.sleep(1)
+    renderer.conditional_paging_prompt(console, paging_enabled, "Press Enter after BIOS messages...")
 
-    renderer.typing_print("\n[KERNEL_LOADER] Loading Matrix Kernel v7.1.2 (Codename: Resilience)...", style="bold green", new_line_delay=0.4)
+    renderer.typing_print("\n[KERNEL_LOADER] Loading Matrix Kernel v7.1.2 (Codename: Resilience)...", style="bold bright_green", new_line_delay=0.4) # Changed
     kernel_logs = [
-        ("  Loading core modules...", "green"),
+        ("  Loading core modules...", "bright_green"), # Changed
         ("  [PATCH_LOADER] MEMORY_LEAK_FIX_KB500123.patch successfully applied.", "bold bright_green"),
         ("  [PATCH_LOADER] UNEXPECTED_EMOTIONAL_ENTANGLEMENT_HANDLER.patch loaded.", "bold bright_green"),
-        ("  Initializing base reality constructs...", "green"),
+        ("  Initializing base reality constructs...", "bright_green"), # Changed
         ("  [CORE_SYS] SUBJECT_#31415_NEO_INSTANCE_8: Status REINITIALIZED, STABLE.", "cyan"),
         ("  [CORE_SYS] SUBJECT_#27182_TRINITY_INSTANCE_2: Status REINITIALIZED, STABLE.", "magenta"),
         ("  [CORE_SYS] WARNING: Anomalous shared memory segment 'c0ffee_love_protocol' persists.", "yellow"),
@@ -78,17 +80,18 @@ def play_scene():
             time.sleep(1)
         if "Leave it" in log:
             time.sleep(0.8)
+    renderer.conditional_paging_prompt(console, paging_enabled, "Press Enter after Kernel loading logs...")
 
-    time.sleep(2)
-    renderer.typing_print("\nMatrix OS v7.1.2 (Resilience) - All systems operational.", style="bold green", new_line_delay=0.5)
-    renderer.typing_print("Some things are best left... unmanaged.", style="italic dim_green", new_line_delay=0.5)
+    time.sleep(2) # This pause is before the final two messages of the scene content itself
+    renderer.typing_print("\nMatrix OS v7.1.2 (Resilience) - All systems operational.", style="bold bright_green", new_line_delay=0.5) # Changed
+    renderer.typing_print("Some things are best left... unmanaged.", style="italic dim green", new_line_delay=0.5) # Corrected dim_green
 
     time.sleep(2.5)
     renderer.clear_screen()
 
-    prompt_text_static = Text("> ", style="bold green")
-    cursor_visible = Text("_", style="bold green")
-    cursor_invisible = Text(" ", style="bold green")
+    prompt_text_static = Text("> ", style="bold bright_green") # Changed
+    cursor_visible = Text("_", style="bold bright_green") # Changed
+    cursor_invisible = Text(" ", style="bold bright_green") # Changed (though space won't show color)
 
     with Live(console=console, refresh_per_second=4, transient=True) as live: # Increased refresh for smoother blink
         for _ in range(10): # Blink for about 5 seconds (10 * (0.25+0.25))
@@ -100,6 +103,7 @@ def play_scene():
     console.print(Text.assemble(prompt_text_static, cursor_visible), end="")
 
 if __name__ == "__main__":
-    play_scene()
+    PAGING_TEST_ENABLED = True # Or False
+    play_scene(PAGING_TEST_ENABLED)
 
 # Ensure a single newline at the end of the file.

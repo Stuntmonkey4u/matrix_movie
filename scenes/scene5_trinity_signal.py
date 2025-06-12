@@ -41,7 +41,7 @@ def generate_payload_snippet():
     ]
     return random.choice(snippets)
 
-def play_scene():
+def play_scene(paging_enabled: bool): # Added paging_enabled argument
     renderer.clear_screen()
 
     renderer.typing_print("[NETWORK_MONITOR_AI] Monitoring deep matrix subnet 77 (Modal Residual Zone)...", style="bold blue", delay=0.025)
@@ -110,6 +110,7 @@ def play_scene():
     time.sleep(0.5)
     console.print(packet_table)
     time.sleep(2.5)
+    renderer.conditional_paging_prompt(console, paging_enabled, "Press Enter after packet table display...")
 
     renderer.typing_print("\n[ANALYST_AI_NET_OPS] Correlating packet origins...", style="bold cyan", new_line_delay=0.4)
     renderer.typing_print(f"[ANALYST_AI_NET_OPS]   Detected multiple pings from MAC addresses resolving to legacy hardware profile: {generate_mac_address()} (TRINITY_HW_SIG_GHOST)", style="cyan")
@@ -120,6 +121,7 @@ def play_scene():
     time.sleep(3.5)
 
 if __name__ == "__main__":
-    play_scene()
+    PAGING_TEST_ENABLED = True # Or False
+    play_scene(PAGING_TEST_ENABLED)
 
 # Ensure a single newline at the end of the file.

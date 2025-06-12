@@ -21,12 +21,12 @@ def generate_error_code():
            "-" + ''.join(random.choice("0123456789ABCDEF") for _ in range(4)) + \
            "-" + ''.join(random.choice("0123456789ABCDEF") for _ in range(4))
 
-def play_scene():
+def play_scene(paging_enabled: bool): # Added paging_enabled argument
     renderer.clear_screen()
 
-    renderer.typing_print("[SIMULATION_CORE] Monitoring Subject #31415 (NEO_INSTANCE_7)... Normal parameters.", style="green", delay=0.02)
+    renderer.typing_print("[SIMULATION_CORE] Monitoring Subject #31415 (NEO_INSTANCE_7)... Normal parameters.", style="bright_green", delay=0.02) # Changed to bright_green
     time.sleep(1)
-    renderer.typing_print("[SIMULATION_CORE] Subject #31415 interacting with reflective surface object: MIRROR_#4B2D", style="green", new_line_delay=0.3)
+    renderer.typing_print("[SIMULATION_CORE] Subject #31415 interacting with reflective surface object: MIRROR_#4B2D", style="bright_green", new_line_delay=0.3) # Changed to bright_green
     time.sleep(1.5)
 
     renderer.typing_print("\n[PHYSICS_ENGINE_ALERT] CRITICAL_ERROR: REFLECTION_SUBSYSTEM_FAILURE", style="bold bright_red", delay=0.04, new_line_delay=0.5)
@@ -45,6 +45,7 @@ def play_scene():
         style="white on red" # Inverted colors for panic
     ))
     time.sleep(2.5)
+    renderer.conditional_paging_prompt(console, paging_enabled, "Press Enter after KERNEL PANIC...")
 
     renderer.typing_print("\n[CRASH_HANDLER] Initiating emergency patch deployment: 'reality_stabilizer_mk4.patch'", style="bold yellow", new_line_delay=0.3)
     renderer.typing_print("[CRASH_HANDLER]   Target: All reflective surface simulation threads for Subject #31415.", style="yellow", new_line_delay=0.2)
@@ -66,13 +67,15 @@ def play_scene():
         if "ERROR" in log or "MISMATCH" in log:
             time.sleep(0.8)
     time.sleep(1.5)
+    renderer.conditional_paging_prompt(console, paging_enabled, "Press Enter after patch logs...")
 
-    renderer.typing_print("\n[SYSTEM_STATUS] Reflection subsystem partially restored. Surface integrity: NOMINAL_BUT_WOBBLY.", style="bold green", new_line_delay=0.3)
+    renderer.typing_print("\n[SYSTEM_STATUS] Reflection subsystem partially restored. Surface integrity: NOMINAL_BUT_WOBBLY.", style="bold bright_green", new_line_delay=0.3) # Changed to bold bright_green
     renderer.typing_print("[DEBUG_NOTE]   'Any sufficiently advanced technology is indistinguishable from a rigged carnival mirror.' - Some AI, probably.", style="italic grey", new_line_delay=0.2)
     renderer.typing_print("[ANALYST_AI_MEMO]   Flagged Subject #31415 for 'reality_bending_tendencies'. Keep an eye on this one. And maybe build fewer mirrors.", style="cyan")
     time.sleep(3.5)
 
 if __name__ == "__main__":
-    play_scene()
+    PAGING_TEST_ENABLED = True # Or False
+    play_scene(PAGING_TEST_ENABLED)
 
 # Ensure a single newline at the end of the file.

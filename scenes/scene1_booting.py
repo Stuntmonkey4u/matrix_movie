@@ -8,7 +8,7 @@ from utils import renderer # Updated path
 # Initialize console
 console = renderer.get_console()
 
-def play_scene():
+def play_scene(paging_enabled: bool): # Added paging_enabled argument
     # Ensure screen is clear at the beginning of the scene
     renderer.clear_screen()
     # ASCII Logo display removed. Scene starts directly with boot sequence.
@@ -17,9 +17,10 @@ def play_scene():
 
     renderer.typing_print("Booting Matrix Operating System v7.1.1 (Codename: Resurrections)", console=console, delay=0.03)
     time.sleep(0.5)
-    renderer.typing_print("Kernel version: 5.4.0-MATRIX-R4", console=console, style="dim green")
+    renderer.typing_print("Kernel version: 5.4.0-MATRIX-R4", console=console, style="dim green") # Keep dim for less important info
     time.sleep(0.5)
     console.print()
+    renderer.conditional_paging_prompt(console, paging_enabled, "Press Enter after initial boot messages...")
 
     logs = [
         "[  0.000001] Initializing system hardware...",
@@ -36,8 +37,37 @@ def play_scene():
         "[  0.003700]   module: human_perception_filter.ko",
         "[  0.004000]   module: analyst_ai_core.ko (v2.0.1)",
         "[  0.004500] All kernel modules loaded.",
-        "[  0.005000] Initializing Analyst AI (PID: 1)...",
-        "[  0.005500] [ANALYST_AI] Core diagnostics: PASSED",
+    ] # Split logs to insert paging point
+    for log_entry in logs:
+        delay = 0.01 if log_entry.startswith("[  ") else 0.03
+        # Default to bright_green (from renderer.DEFAULT_STYLE) if not otherwise specified by conditions
+        style = renderer.DEFAULT_STYLE
+        if log_entry.startswith("[  "):
+            style = "dim green" # Keep timestamped kernel messages dim
+
+        # Specific overrides based on content (these were already fine)
+        if "ANALYST_AI" in log_entry:
+            style = "bold cyan"
+        elif "EXPERIMENTAL" in log_entry or "WARNING" in log_entry:
+            style = "bold yellow"
+        elif "ERROR" in log_entry:
+            style = "bold red"
+
+        if random.random() < 0.05:
+            renderer.typing_print(log_entry, console=console, delay=0.001, style=style, new_line_delay=0.05)
+        elif random.random() < 0.1:
+            renderer.typing_print(log_entry, console=console, delay=0.01, style=style, new_line_delay=0.1)
+        else:
+            renderer.typing_print(log_entry, console=console, delay=delay, style=style, new_line_delay=0.2)
+
+        if "kernel modules loaded." in log_entry: # This will be the last line of this loop
+            time.sleep(0.8) # Keep existing pause
+
+    renderer.conditional_paging_prompt(console, paging_enabled, "Press Enter after kernel modules loaded...")
+
+    logs_part2 = [ # Continue with the rest of the logs
+        "[  0.005000] Initializing Analyst AI (PID: 1)...", # This will use default bright_green
+        "[  0.005500] [ANALYST_AI] Core diagnostics: PASSED", # This will be bold cyan due to "ANALYST_AI"
         "[  0.006000] [ANALYST_AI] Loading personality matrix: 'StrictButFair_v3.cfg'",
         "[  0.006500] [ANALYST_AI] Calibrating modal realism parameters...",
         "[  0.007000] Compiling new reality schema for 'The Anomaleum' project...",
@@ -50,9 +80,14 @@ def play_scene():
         "[  0.014000] Welcome to the New Matrix. Enjoy your stay (or don't, it's your 'choice')."
     ]
 
-    for log_entry in logs:
+    for log_entry in logs_part2: # Corrected loop variable
         delay = 0.01 if log_entry.startswith("[  ") else 0.03
-        style = "dim green" if log_entry.startswith("[  ") else "green"
+        # Default to bright_green (from renderer.DEFAULT_STYLE) if not otherwise specified by conditions
+        style = renderer.DEFAULT_STYLE
+        if log_entry.startswith("[  "):
+            style = "dim green" # Keep timestamped kernel messages dim
+
+        # Specific overrides based on content
         if "ANALYST_AI" in log_entry:
             style = "bold cyan"
         elif "EXPERIMENTAL" in log_entry or "WARNING" in log_entry:
@@ -73,10 +108,16 @@ def play_scene():
             time.sleep(1.2)
 
     console.print()
+    renderer.conditional_paging_prompt(console, paging_enabled, "Press Enter before 'System Ready' message...")
     renderer.typing_print("System Ready. Awaiting Inputs...", console=console, style="bold white", delay=0.05)
     time.sleep(2.5)
+    # No prompt at the very end of the scene, main driver handles inter-scene paging.
 
 if __name__ == '__main__':
+    # For standalone testing of this scene
+    PAGING_TEST_ENABLED = True # Or False, to test both modes
+    # Example: PAGING_TEST_ENABLED = True if os.getenv("PAGING") == "true" else False
+
     import sys
     import os
 
@@ -98,4 +139,4 @@ if __name__ == '__main__':
     # For scene1, no specific ASCII art is created here anymore.
     # os.makedirs(os.path.join(project_root, "ascii_art"), exist_ok=True)
 
-    play_scene()
+    play_scene(PAGING_TEST_ENABLED) # Pass the test paging choice
