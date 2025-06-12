@@ -9,21 +9,11 @@ from matrix_movie_project.utils import renderer
 console = renderer.get_console()
 
 def play_scene():
+    # Ensure screen is clear at the beginning of the scene
     renderer.clear_screen()
-
-    # Display Matrix logo
-    logo_path = "matrix_movie_project/ascii_art/matrix_logo.txt"
-    # Check if logo exists, if not, print a placeholder
-    try:
-        # renderer.display_ascii_art handles FileNotFoundError,
-        # but direct check is fine if preferred for other logic.
-        # For now, let display_ascii_art handle it.
-        renderer.display_ascii_art(logo_path, console=console, style="bold green", print_method="direct")
-    except FileNotFoundError: # This is actually handled by display_ascii_art, but kept for explicitness if desired
-        console.print(Panel("[ Placeholder for Matrix Logo - File Not Found ]", title="ASCII Art Missing", style="bold red", border_style="red"))
-
-    time.sleep(2)
-    renderer.clear_screen()
+    # ASCII Logo display removed. Scene starts directly with boot sequence.
+    # The clear_screen() call that was after the logo is also removed / consolidated here.
+    time.sleep(0.5) # Optional short pause before boot sequence starts
 
     renderer.typing_print("Booting Matrix Operating System v7.1.1 (Codename: Resurrections)", console=console, delay=0.03)
     time.sleep(0.5)
@@ -103,28 +93,8 @@ if __name__ == '__main__':
     # Now this import should work because matrix_movie_project is in sys.path
     from matrix_movie_project.utils import renderer
 
-    art_dir = os.path.join(project_root, "ascii_art")
-    logo_path_test = os.path.join(art_dir, "matrix_logo.txt")
-    os.makedirs(art_dir, exist_ok=True) # Ensure ascii_art directory exists
-
-    # Create the matrix_logo.txt only if it's missing for the test run
-    if not os.path.exists(logo_path_test):
-        with open(logo_path_test, "w", encoding='utf-8') as f:
-            f.write("                           .-'''-.\n")
-            f.write("                          /       \\\n")
-            f.write("                         |   __    |\n")
-            f.write("                         \\  /  \\  /\n")
-            f.write("                          '.'.''.'\n")
-            f.write("                            ''.'\n")
-            f.write("        ____________________.'   '.______________________\n")
-            f.write("        --------------------       ----------------------\n")
-            f.write("        ____________________       ______________________\n")
-            f.write("        --------------------.   .----------------------\n")
-            f.write("                           .'   '.\n")
-            f.write("                          /       \\\n")
-            f.write("                         |   .'.   |\n")
-            f.write("                         \\  /  \\  /\n")
-            f.write("                          '.'.''.'\n")
-            f.write("                            ''.'\n")
+    # The specific logic for creating matrix_logo.txt for test runs is removed.
+    # The ascii_art directory might still be created by renderer.py's test if that's run.
+    # os.makedirs(os.path.join(project_root, "ascii_art"), exist_ok=True) # This can be kept if other ascii might be used for testing
 
     play_scene()

@@ -12,16 +12,12 @@ def play_scene():
 
     renderer.typing_print("[ANALYST_AI_CORE] Main process online. Status: NOMINAL.", style="bold cyan", delay=0.03)
     time.sleep(1)
-
-    # Display Analyst ASCII art
-    analyst_art_path = "matrix_movie_project/ascii_art/analyst_face.txt"
-    try:
-        # renderer.display_ascii_art will handle FileNotFoundError
-        renderer.display_ascii_art(analyst_art_path, console=console, style="bold blue", print_method="direct")
-    except FileNotFoundError: # Fallback, though renderer also handles it.
-        console.print(Panel("[ Placeholder for Analyst Art - File Not Found ]", title="ASCII Art Missing", style="bold red", border_style="red"))
-
-    time.sleep(1.5)
+    # Analyst ASCII art display removed.
+    # Optional: Add a clear screen here if the transition feels abrupt,
+    # or adjust the sleep time if the art's pause was important.
+    # For now, just removing the art and its specific sleep.
+    # A small pause might still be good.
+    time.sleep(0.5)
 
     renderer.typing_print("\n[ANALYST_AI_CORE] Initiating self-diagnostic sequence...", style="cyan", new_line_delay=0.5)
 
@@ -114,20 +110,7 @@ if __name__ == '__main__':
     # This import should now work correctly when script is run directly
     from matrix_movie_project.utils import renderer
 
-    art_dir = os.path.join(project_root, "ascii_art")
-    analyst_art_path_test = os.path.join(art_dir, "analyst_face.txt")
-    os.makedirs(art_dir, exist_ok=True)
-    if not os.path.exists(analyst_art_path_test):
-        # Create the analyst_face.txt only if it's missing for the test run
-        with open(analyst_art_path_test, "w", encoding='utf-8') as f:
-            f.write("/////////////////////////////////////\n") # Added newlines for each line
-            f.write("//        .--\"\"--.               //\n")
-            f.write("//       /        \\              //\n")
-            f.write("//      |  O  _  O |             //\n")
-            f.write("//      |   (_/ \\_) |             //\n")
-            f.write("//       \\        /              //\n")
-            f.write("//        `------'               //\n")
-            f.write("//     SYSTEM_ANALYST_V2.0       //\n")
-            f.write("/////////////////////////////////////\n")
+    # The specific logic for creating analyst_face.txt for test runs is removed.
+    # os.makedirs(os.path.join(project_root, "ascii_art"), exist_ok=True) # This can be kept if other ascii might be used for testing
 
     play_scene()
