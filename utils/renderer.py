@@ -17,7 +17,7 @@ def get_console():
 def clear_screen():
     os.system('cls' if os.name == 'nt' else 'clear')
 
-def typing_print(text: str, delay: float = 0.03, style: str = DEFAULT_STYLE, console=None, new_line_delay: float = 0.2):
+def typing_print(text: str, delay: float = 0.034, style: str = DEFAULT_STYLE, console=None, new_line_delay: float = 0.2): # Adjusted default delay
     console = console or get_console()
 
     lines = text.split('\n')

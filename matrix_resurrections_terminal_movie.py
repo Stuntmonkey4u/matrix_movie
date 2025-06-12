@@ -33,6 +33,7 @@ try:
     from scenes import scene5_trinity_signal # Updated path
     from scenes import scene6_process_merge # Updated path
     from scenes import scene7_system_overload # Updated path
+    from scenes import scene7b_trinity_vs_analyst # Added import for Scene 7b
     from scenes import scene8_reboot # Updated path
 except ModuleNotFoundError as e_orig:
     # This error handling is for project-specific modules (scenes, utils)
@@ -67,6 +68,7 @@ def main():
         ("Trinity’s Signal Detected", scene5_trinity_signal.play_scene, 50),
         ("Process Merge: Neo + Trinity", scene6_process_merge.play_scene, 60),
         ("System Overload & Analyst Panic", scene7_system_overload.play_scene, 60),
+        ("Trinity vs. Analyst", scene7b_trinity_vs_analyst.play_scene, 60), # Added Scene 7b
         ("Reboot and Hope", scene8_reboot.play_scene, 60)
     ]
 
@@ -96,14 +98,20 @@ def main():
 
         scene_function() # Execute the current scene's play_scene() function
 
-        if i < total_scenes - 1: # If it's not the last scene, play a transition
-            time.sleep(2) # Pause AFTER scene completion, before clearing for transition
+        # Add "Press Enter to continue" logic after each scene, except the last one
+        if i < total_scenes - 1: # Only if it's NOT the last scene
+            console.print("\n\n[bold yellow]- - - Press Enter to continue - - -[/bold yellow]", justify="center")
+            input() # Wait for user to press Enter
+
+            # Transition logic starts immediately after Enter is pressed
             renderer.clear_screen()
             console.print(f"Transitioning from {scene_name}...", style="bold dim green", justify="center")
             time.sleep(1) # Keep this brief pause before rain
             renderer.matrix_code_rain(duration=2, console=console) # Adjusted: Inter-scene rain duration to 2 seconds
         else:
-            # After the last scene (scene8 already ends with a blinking cursor), no transition needed.
+            # This is after the last scene (Scene 8)
+            # Scene 8 handles its own ending (blinking cursor), so no "Press Enter" here.
+            # And no transition rain.
             pass # Scene 8 handles the final blinking cursor, and the movie concludes.
 
     # Final completion messages after all scenes have played.
