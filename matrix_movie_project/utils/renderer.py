@@ -5,7 +5,6 @@ import shutil
 from rich.console import Console
 from rich.text import Text
 from rich.live import Live
-# from rich.panel import Panel # Not used yet
 
 DEFAULT_STYLE = "bold green"
 KATAKANA_CHARS = "アイウエオカキクケコサシスセソタチツテトナニヌネノハヒフヘホマミムメモヤユヨラリルレロワヲン"
@@ -20,27 +19,24 @@ def clear_screen():
 
 def typing_print(text: str, delay: float = 0.03, style: str = DEFAULT_STYLE, console=None, new_line_delay: float = 0.2):
     console = console or get_console()
-    lines = text.splitlines()
+
+    lines = text.split('\n')
+    num_lines = len(lines)
+
     for i, line in enumerate(lines):
-        for char_idx, char in enumerate(line):
-            console.print(Text(char, style=style), end="")
+        for char_code in line: # Iterate through characters of the current line segment
+            console.print(Text(char_code, style=style), end="")
             time.sleep(delay)
-        # Only print newline if it's not the last line of the input text
-        # and the original line had a newline (implicit from splitlines)
-        # or if it's the last line and the original text doesn't end with a newline character
-        if i < len(lines) - 1:
-            console.print()
+
+        # After typing out all characters of 'line':
+        # Always print a newline because each 'line' from text.split('\n')
+        # represents content that was originally followed by a newline, or it's the end of the text.
+        console.print()
+
+        # Apply new_line_delay if this is not the very last line segment.
+        # This avoids an extra delay after the absolute final line processed by the loop.
+        if i < num_lines - 1:
             time.sleep(new_line_delay)
-        elif i == len(lines) -1 and not text.rstrip('\n\r').endswith(line): # handles if last line is not the full end of text
-             console.print()
-             time.sleep(new_line_delay)
-
-
-    # If the input text itself ends with a newline, splitlines will produce an empty string at the end
-    # if text.endswith(('\n', '\r', '\r\n')):
-    #      console.print()
-    #      time.sleep(new_line_delay)
-
 
 def display_ascii_art(filepath: str, console=None, style: str = DEFAULT_STYLE, print_method: str = "direct", typing_delay: float = 0.001, line_delay: float = 0.01):
     console = console or get_console()
@@ -48,7 +44,6 @@ def display_ascii_art(filepath: str, console=None, style: str = DEFAULT_STYLE, p
         with open(filepath, 'r', encoding='utf-8') as f:
             art = f.read()
         if print_method == "typing":
-            # For typing art, we want minimal delay between characters of the same line, but some delay after each line.
             typing_print(art, delay=typing_delay, style=style, console=console, new_line_delay=line_delay)
         else:
             console.print(Text(art, style=style))
@@ -61,34 +56,27 @@ def display_ascii_art(filepath: str, console=None, style: str = DEFAULT_STYLE, p
 def matrix_code_rain(duration: float = 7, console=None, refresh_rate: int = 15):
     console = console or get_console()
     width, height = shutil.get_terminal_size()
-    height -=1 # Adjust for potential off-by-one with console height
+    height -=1
 
-    # stores the state of each column, each char is a tuple (char, style_name)
     columns = [[(" ", "default") for _ in range(height)] for _ in range(width)]
-    # stores how long a char has been 'bright' to transition to trail
     head_age = [[0 for _ in range(height)] for _ in range(width)]
-
 
     with Live(console=console, refresh_per_second=refresh_rate, transient=True, screen=True) as live:
         start_time = time.time()
 
         while time.time() - start_time < duration:
-            # Create the text for the current frame
             current_frame_text = Text()
-
-            for j in range(width): # Iterate over columns
-                # Shift characters down
+            for j in range(width):
                 for i in range(height - 1, 0, -1):
                     columns[j][i] = columns[j][i-1]
                     head_age[j][i] = head_age[j][i-1]
 
-                # Generate new character at the top of the column
-                if random.random() < 0.075:  # Chance to start a new drop
+                if random.random() < 0.075:
                     char = random.choice(MATRIX_CHARS)
                     columns[j][0] = (char, "bold bright_green")
-                    head_age[j][0] = 0 # It's new
-                else: # Potentially continue an existing drop or leave blank
-                    if columns[j][0][0] != " ": # If not blank, update age and style
+                    head_age[j][0] = 0
+                else:
+                    if columns[j][0][0] != " ":
                         head_age[j][0] +=1
                         current_char, current_style = columns[j][0]
 
@@ -102,12 +90,10 @@ def matrix_code_rain(duration: float = 7, console=None, refresh_rate: int = 15):
                     else:
                         head_age[j][0] = 0
 
-
-                if columns[j][0][0] == " " and random.random() < 0.01: # very dim, quick flicker
+                if columns[j][0][0] == " " and random.random() < 0.01:
                     columns[j][0] = (random.choice(MATRIX_CHARS), "dim green")
-                    head_age[j][0] = 5 # Make it fade quickly
+                    head_age[j][0] = 5
 
-            # Assemble the frame for Rich Live
             for i in range(height):
                 line_text = Text()
                 for j in range(width):
@@ -119,14 +105,24 @@ def matrix_code_rain(duration: float = 7, console=None, refresh_rate: int = 15):
 
             live.update(current_frame_text)
             time.sleep(1/refresh_rate)
-    # Live(transient=True, screen=True) clears the screen on exit
 
 if __name__ == '__main__':
     con = get_console()
 
-    art_dir = "matrix_movie_project/ascii_art"
-    test_art_file = os.path.join(art_dir, "test_logo.txt")
-    os.makedirs(art_dir, exist_ok=True)
+    art_dir = os.path.join(os.path.dirname(__file__), "..", "ascii_art") # Adjusted path for test
+    # To run renderer.py directly for testing, it's in utils/, ascii_art is one level up then down.
+    # So, from matrix_movie_project/utils to matrix_movie_project/ascii_art
+    if not os.path.isabs(art_dir): # If not absolute, make it relative to this file's dir
+        art_dir = os.path.join(os.path.dirname(__file__), art_dir)
+
+    # Correct path for test_logo.txt relative to renderer.py
+    # renderer.py is in matrix_movie_project/utils/
+    # ascii_art is in matrix_movie_project/ascii_art/
+    # So, path from renderer.py to ascii_art is '../ascii_art'
+    art_dir_test_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'ascii_art'))
+    test_art_file = os.path.join(art_dir_test_path, "test_logo.txt")
+
+    os.makedirs(art_dir_test_path, exist_ok=True)
     if not os.path.exists(test_art_file):
         with open(test_art_file, "w", encoding='utf-8') as f:
             f.write("  /\\_/\\  \n")
@@ -137,9 +133,11 @@ if __name__ == '__main__':
     typing_print("Renderer Test Sequence Initiated...", console=con, style="bold yellow")
     time.sleep(1)
 
-    typing_print("\n--- Testing typing_print ---", console=con, style="bold cyan")
+    typing_print("\n--- Testing typing_print (New Logic) ---", console=con, style="bold cyan")
     typing_print("This is a single line test.", console=con)
-    typing_print("This is a multi-line test.\nSecond line here.\nAnd a third.", console=con, delay=0.02, new_line_delay=0.1)
+    typing_print("This is a multi-line test.\nSecond line here.\nAnd a third (ends without newline in string).", console=con, delay=0.02, new_line_delay=0.1)
+    typing_print("This has explicit trailing newline.\n", console=con, delay=0.02, new_line_delay=0.1)
+    typing_print("Line A\n\nLine C (should have empty line between A and C)", console=con, delay=0.02, new_line_delay=0.1)
     time.sleep(1)
 
     typing_print("\n--- Testing display_ascii_art (direct) ---", console=con, style="bold cyan")
