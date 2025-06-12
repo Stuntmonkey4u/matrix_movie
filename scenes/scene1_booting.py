@@ -3,7 +3,7 @@ import random # Added missing import
 from rich.console import Console
 from rich.panel import Panel
 from rich.text import Text
-from matrix_movie_project.utils import renderer
+from utils import renderer # Updated path
 
 # Initialize console
 console = renderer.get_console()
@@ -86,15 +86,16 @@ if __name__ == '__main__':
     # os.path.dirname(os.path.dirname(__file__)) is matrix_movie_project
     project_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
-    # Add the project root to sys.path to allow package imports
+    # Add the project root to sys.path to allow package imports like 'from utils import ...'
     if project_root not in sys.path:
         sys.path.insert(0, project_root)
 
-    # Now this import should work because matrix_movie_project is in sys.path
-    from matrix_movie_project.utils import renderer
+    # Now this import should work because the project root (containing 'utils' and 'scenes' folders) is in sys.path
+    from utils import renderer # Updated import path
 
-    # The specific logic for creating matrix_logo.txt for test runs is removed.
-    # The ascii_art directory might still be created by renderer.py's test if that's run.
-    # os.makedirs(os.path.join(project_root, "ascii_art"), exist_ok=True) # This can be kept if other ascii might be used for testing
+    # The specific logic for creating matrix_logo.txt for test runs was removed in a previous step.
+    # Ensure ascii_art directory exists if renderer's test part needs it (though test_logo.txt is specific to renderer.py's own test)
+    # For scene1, no specific ASCII art is created here anymore.
+    # os.makedirs(os.path.join(project_root, "ascii_art"), exist_ok=True)
 
     play_scene()

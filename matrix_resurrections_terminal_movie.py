@@ -17,28 +17,27 @@ from rich.console import Console
 from rich.text import Text
 
 # Setup sys.path correctly for project module imports
-# This script is matrix_movie_project/matrix_resurrections_terminal_movie.py
-# To use 'from matrix_movie_project.scenes...', the dir *containing* 'matrix_movie_project' must be in sys.path
-script_path = os.path.abspath(__file__)
-project_root_directory = os.path.dirname(script_path) # This is /app/matrix_movie_project
-parent_dir_of_project_root = os.path.dirname(project_root_directory) # This is /app
-
-if parent_dir_of_project_root not in sys.path:
-    sys.path.insert(0, parent_dir_of_project_root)
+# Ensure the script's own directory (which is the project root) is in sys.path.
+# This allows imports like 'from utils import ...' and 'from scenes import ...' when the script is run directly.
+script_dir = os.path.dirname(os.path.abspath(__file__))
+if script_dir not in sys.path:
+    sys.path.insert(0, script_dir)
 
 # Main import block for project's scenes and utilities
 try:
-    from matrix_movie_project.utils import renderer
-    from matrix_movie_project.scenes import scene1_booting
-    from matrix_movie_project.scenes import scene2_analyst_ai
-    from matrix_movie_project.scenes import scene3_neo_awakening
-    from matrix_movie_project.scenes import scene4_mirror_glitch
-    from matrix_movie_project.scenes import scene5_trinity_signal
-    from matrix_movie_project.scenes import scene6_process_merge
-    from matrix_movie_project.scenes import scene7_system_overload
-    from matrix_movie_project.scenes import scene8_reboot
+    from utils import renderer # Updated path
+    from scenes import scene1_booting # Updated path
+    from scenes import scene2_analyst_ai # Updated path
+    from scenes import scene3_neo_awakening # Updated path
+    from scenes import scene4_mirror_glitch # Updated path
+    from scenes import scene5_trinity_signal # Updated path
+    from scenes import scene6_process_merge # Updated path
+    from scenes import scene7_system_overload # Updated path
+    from scenes import scene8_reboot # Updated path
 except ModuleNotFoundError as e_orig:
     # This error handling is for project-specific modules (scenes, utils)
+    # The sys.path logic above should make 'scenes' and 'utils' directly importable
+    # if the script is run from the project root (where this script itself is located).
     sys.stderr.write("\n--- ERROR: Project Module Not Found ---\n")
     sys.stderr.write(f"A required project file (e.g., a scene or utility script) could not be found.\n")
     sys.stderr.write(f"This often means the script is not being run from the correct directory, or the project's file structure has been altered.\n\n")

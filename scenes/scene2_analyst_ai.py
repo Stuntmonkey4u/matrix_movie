@@ -3,7 +3,7 @@ import random
 from rich.console import Console
 from rich.panel import Panel
 from rich.text import Text # Import Text
-from matrix_movie_project.utils import renderer
+from utils import renderer # Updated path
 
 console = renderer.get_console()
 
@@ -108,9 +108,9 @@ if __name__ == '__main__':
         sys.path.insert(0, project_root)
 
     # This import should now work correctly when script is run directly
-    from matrix_movie_project.utils import renderer
+    from utils import renderer # Updated import path
 
-    # The specific logic for creating analyst_face.txt for test runs is removed.
-    # os.makedirs(os.path.join(project_root, "ascii_art"), exist_ok=True) # This can be kept if other ascii might be used for testing
+    # The specific logic for creating analyst_face.txt for test runs was removed in a previous step.
+    # os.makedirs(os.path.join(project_root, "ascii_art"), exist_ok=True)
 
     play_scene()

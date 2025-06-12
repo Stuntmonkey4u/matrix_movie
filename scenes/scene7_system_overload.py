@@ -13,7 +13,7 @@ project_root = os.path.dirname(current_dir)
 if project_root not in sys.path:
     sys.path.insert(0, project_root)
 
-from matrix_movie_project.utils import renderer
+from utils import renderer # Updated path
 
 console = renderer.get_console()
 
