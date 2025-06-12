@@ -66,7 +66,7 @@ def generate_analyst_panic_dialogue():
     ]
     return dialogue
 
-def play_scene():
+def play_scene(paging_enabled: bool): # Added paging_enabled argument
     renderer.clear_screen()
 
     renderer.typing_print("[SYSTEM_STATUS] Catastrophic resonance detected between Subject #31415 and Subject #27182.", style="bold red on black", delay=0.04)
@@ -78,18 +78,21 @@ def play_scene():
     renderer.clear_screen()
     console.print(Panel(Text(generate_kernel_panic_message(), style="white"), title="!!! KERNEL PANIC !!!", border_style="bold red", style="red on black"))
     time.sleep(3.5)
+    renderer.conditional_paging_prompt(console, paging_enabled, "Press Enter after Kernel Panic...")
     renderer.clear_screen()
 
     # Memory Leak Report
     renderer.typing_print(generate_memory_leak_report(), style="yellow", delay=0.02, new_line_delay=0.3)
     time.sleep(3)
+    renderer.conditional_paging_prompt(console, paging_enabled, "Press Enter after Memory Leak Report...")
     renderer.clear_screen()
 
     # Analyst AI Panic Dialogue
     dialogue = generate_analyst_panic_dialogue()
     last_style = ""
-    for speaker, line, style in dialogue:
-        if speaker == "DEBUG_ANALYST" and last_style != style: # Check against current style to group same-styled debug thoughts if any
+    dialogue_midpoint = len(dialogue) // 2
+    for idx, (speaker, line, style) in enumerate(dialogue):
+        if speaker == "DEBUG_ANALYST" and last_style != style:
              console.print()
 
         prefix = f"[{speaker}] "
@@ -103,12 +106,17 @@ def play_scene():
         if "THIS IS NOT A DRILL" in line:
             time.sleep(1)
 
+        if idx == dialogue_midpoint:
+            renderer.conditional_paging_prompt(console, paging_enabled, "Press Enter to continue Analyst dialogue...")
+
     time.sleep(3)
+    renderer.conditional_paging_prompt(console, paging_enabled, "Press Enter before 'Analyst AI offline' message...")
     renderer.clear_screen()
     renderer.typing_print("[SYSTEM_AUTOMATION] Analyst AI offline. Watchdog protocol initiating emergency system reboot...", style="bold white on red", delay=0.05)
     time.sleep(3)
 
 if __name__ == "__main__":
-    play_scene()
+    PAGING_TEST_ENABLED = True # Or False
+    play_scene(PAGING_TEST_ENABLED)
 
 # Ensure a single newline at the end of the file.

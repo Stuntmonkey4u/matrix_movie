@@ -39,7 +39,7 @@ def generate_syscall_args(syscall_name):
     else:
         return "..."
 
-def play_scene():
+def play_scene(paging_enabled: bool): # Added paging_enabled argument
     renderer.clear_screen()
 
     renderer.typing_print(f"[KERNEL_SCHEDULER] High inter-process communication detected between PID {PID_NEO} (NEO_INSTANCE_7) and PID {PID_TRINITY} (TRINITY_RECOVERY_INSTANCE_1)...", style="bold yellow", delay=0.025)
@@ -67,7 +67,7 @@ def play_scene():
 
         log_line = f"[{pid:<5}] {syscall_name}{args:<60} = {result:<20} <{duration:.4f}>"
 
-        style = "green" if pid == PID_NEO else "magenta"
+        style = "bright_green" if pid == PID_NEO else "magenta" # Changed green to bright_green
         if "ERROR" in result or "ENOENT" in result or "EAGAIN" in result:
             style = "bold red"
         elif "shmget" in syscall_name or "shmat" in syscall_name:
@@ -82,6 +82,7 @@ def play_scene():
             renderer.typing_print(f"[{PID_NEO}] --- SIGUSR1 {{si_signo=SIGUSR1, si_code=SI_USER}} ---", style="italic orange1", new_line_delay=0.2)
             renderer.typing_print(f"[{PID_TRINITY}] --- SIGUSR1 {{si_signo=SIGUSR1, si_code=SI_USER}} ---", style="italic orange1", new_line_delay=0.3)
             time.sleep(0.5)
+            renderer.conditional_paging_prompt(console, paging_enabled, "Press Enter after SIGUSR1 signals...")
 
         if "shmget" in syscall_name and "c0ffee" in args:
             time.sleep(0.5)
@@ -93,9 +94,11 @@ def play_scene():
                 time.sleep(random.uniform(0.05, 0.2))
             console.print(Text("] LOADED & ACTIVE.", style="bold hot_pink"))
             time.sleep(1)
+            renderer.conditional_paging_prompt(console, paging_enabled, "Press Enter after 'love_actually.exe' sequence...")
 
 
-    time.sleep(1.5)
+    time.sleep(1.5) # Pause after strace block finishes
+    renderer.conditional_paging_prompt(console, paging_enabled, "Press Enter before Resource Manager warnings...")
     renderer.typing_print(f"\n[RESOURCE_MANAGER] Warning: High contention for shared resource 'RES_HEARTBEAT_SYNC'.", style="bold yellow", new_line_delay=0.3)
     renderer.typing_print(f"[RESOURCE_MANAGER]   PID {PID_NEO} and PID {PID_TRINITY} attempting simultaneous lock.", style="yellow", new_line_delay=0.2)
     renderer.typing_print("[RESOURCE_MANAGER]   This typically ends in a deadlock or... something more interesting.", style="italic yellow", new_line_delay=0.4)
@@ -108,6 +111,7 @@ def play_scene():
     time.sleep(4)
 
 if __name__ == "__main__":
-    play_scene()
+    PAGING_TEST_ENABLED = True # Or False
+    play_scene(PAGING_TEST_ENABLED)
 
 # Ensure a single newline at the end of the file.
