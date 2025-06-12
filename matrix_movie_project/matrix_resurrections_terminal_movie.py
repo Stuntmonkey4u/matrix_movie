@@ -1,10 +1,22 @@
-import time
 import sys
 import os
-from rich.console import Console
-from rich.text import Text # Import Text
+import time # time needs to be imported before it's used in main()
 
-# Setup sys.path correctly from the outset
+# Dependency Check for 'rich'
+try:
+    import rich
+except ImportError:
+    # Using sys.stderr.write for error messages before rich might be available
+    sys.stderr.write("Error: The 'rich' library is not installed. This project requires 'rich' for terminal graphics.\n")
+    sys.stderr.write("Please install it by running: pip install rich\n")
+    sys.stderr.write("Alternatively, install all project dependencies with: pip install -r requirements.txt\n")
+    sys.exit(1)
+
+# Rich library imports (must be after the dependency check)
+from rich.console import Console
+from rich.text import Text
+
+# Setup sys.path correctly for project module imports
 # This script is matrix_movie_project/matrix_resurrections_terminal_movie.py
 # To use 'from matrix_movie_project.scenes...', the dir *containing* 'matrix_movie_project' must be in sys.path
 script_path = os.path.abspath(__file__)
@@ -14,7 +26,7 @@ parent_dir_of_project_root = os.path.dirname(project_root_directory) # This is /
 if parent_dir_of_project_root not in sys.path:
     sys.path.insert(0, parent_dir_of_project_root)
 
-# Main import block for scenes and utilities
+# Main import block for project's scenes and utilities
 try:
     from matrix_movie_project.utils import renderer
     from matrix_movie_project.scenes import scene1_booting
@@ -23,19 +35,31 @@ try:
     from matrix_movie_project.scenes import scene4_mirror_glitch
     from matrix_movie_project.scenes import scene5_trinity_signal
     from matrix_movie_project.scenes import scene6_process_merge
-    from matrix_movie_project.scenes import scene7_system_overload # Add Scene 7 import
+    from matrix_movie_project.scenes import scene7_system_overload
     from matrix_movie_project.scenes import scene8_reboot
 except ModuleNotFoundError as e_orig:
-    print(f"Error: A required module was not found. This script expects to be part of the 'matrix_movie_project' structure.")
-    print(f"Please run this script from the directory *containing* the 'matrix_movie_project' directory,") # User guidance
-    print(f"or ensure 'matrix_movie_project' and its submodules (scenes, utils) are correctly installed or in PYTHONPATH.")
-    print(f"Details: {e_orig}")
-    sys.exit(1) # Exit if imports fail
+    # This error handling is for project-specific modules (scenes, utils)
+    sys.stderr.write("\n--- ERROR: Project Module Not Found ---\n")
+    sys.stderr.write(f"A required project file (e.g., a scene or utility script) could not be found.\n")
+    sys.stderr.write(f"This often means the script is not being run from the correct directory, or the project's file structure has been altered.\n\n")
+    sys.stderr.write(f"Details: {e_orig}\n\n")
+    sys.stderr.write(f"For this script ('{os.path.basename(script_path)}') to work, it expects:\n")
+    sys.stderr.write(f"1. To be located within a 'matrix_movie_project' directory (currently at: '{project_root_directory}').\n")
+    sys.stderr.write(f"2. The directory *containing* 'matrix_movie_project' (which is: '{parent_dir_of_project_root}') to be in Python's search path.\n")
+    sys.stderr.write(f"   (The script attempts to add this automatically.)\n\n")
+    sys.stderr.write(f"Current Python search paths (sys.path):\n")
+    for p in sys.path:
+        sys.stderr.write(f"  - {p}\n")
+    sys.stderr.write("\nPlease verify your setup and try running again from the directory that contains 'matrix_movie_project'.\n")
+    sys.stderr.write("--- End of Error Report ---\n")
+    sys.exit(1) # Exit if project imports fail
 
 
 console = renderer.get_console() # Global console instance from renderer
 
 def main():
+    # Define all scenes to be played in order, along with their estimated durations (for display only)
+    # Each tuple: (Display Name, function_to_call, estimated_duration_seconds)
     scenes = [
         ("Booting the New Matrix", scene1_booting.play_scene, 45),
         ("Analyst AI Online", scene2_analyst_ai.play_scene, 60),
@@ -43,7 +67,7 @@ def main():
         ("Mirror Glitch Exception", scene4_mirror_glitch.play_scene, 50),
         ("Trinity’s Signal Detected", scene5_trinity_signal.play_scene, 50),
         ("Process Merge: Neo + Trinity", scene6_process_merge.play_scene, 60),
-        ("System Overload & Analyst Panic", scene7_system_overload.play_scene, 60), # Add Scene 7 to the list
+        ("System Overload & Analyst Panic", scene7_system_overload.play_scene, 60),
         ("Reboot and Hope", scene8_reboot.play_scene, 60)
     ]
 
@@ -51,13 +75,13 @@ def main():
     renderer.clear_screen()
     console.print("Preparing The Matrix Experience...", style="bold green", justify="center")
     time.sleep(1.5)
-    renderer.matrix_code_rain(duration=15, console=console) # Adjusted: Initial rain duration (as per subtask instruction)
+    renderer.matrix_code_rain(duration=15, console=console)
 
     total_scenes = len(scenes)
     # Calculate and display the estimated total runtime.
     # Formula: Sum of all scene durations + initial rain + sum of all inter-scene rains.
-    initial_rain_duration = 15 # Duration of the first code rain (matches above)
-    inter_scene_rain_duration = 10 # Duration of code rain between scenes (matches below)
+    initial_rain_duration = 15
+    inter_scene_rain_duration = 10
     num_transitions = total_scenes - 1 if total_scenes > 0 else 0
     estimated_total_time = sum(s[2] for s in scenes) + initial_rain_duration + (num_transitions * inter_scene_rain_duration)
 
@@ -78,7 +102,7 @@ def main():
             renderer.clear_screen()
             console.print(f"Transitioning from {scene_name}...", style="bold dim green", justify="center")
             time.sleep(1) # Keep this brief pause before rain
-            renderer.matrix_code_rain(duration=inter_scene_rain_duration, console=console) # Use defined inter-scene rain duration
+            renderer.matrix_code_rain(duration=inter_scene_rain_duration, console=console)
         else:
             # After the last scene (scene8 already ends with a blinking cursor), no transition needed.
             pass # Scene 8 handles the final blinking cursor, and the movie concludes.
@@ -86,7 +110,7 @@ def main():
     # Final completion messages after all scenes have played.
     renderer.clear_screen()
     console.print("The Matrix Resurrections: Terminal Movie Experience - Complete.", style="bold green", justify="center")
-    console.print("Thank you for watching. Reality is what you make it.", style="dim green", justify="center") # Corrected style
+    console.print("Thank you for watching. Reality is what you make it.", style="dim green", justify="center")
     time.sleep(3)
     renderer.clear_screen()
 
@@ -94,17 +118,26 @@ if __name__ == '__main__':
     try:
         main()
     except KeyboardInterrupt:
-        renderer.clear_screen()
-        console.print("System override: User initiated shutdown. Exiting The Matrix.", style="bold yellow", justify="center")
+        # Use basic print for KeyboardInterrupt if console object might not be initialized
+        # (though in this structure, it should be if rich is present)
+        if 'renderer' in globals() and renderer and 'console' in globals() and console:
+            renderer.clear_screen()
+            console.print("System override: User initiated shutdown. Exiting The Matrix.", style="bold yellow", justify="center")
+        else:
+            sys.stdout.write("\nSystem override: User initiated shutdown. Exiting The Matrix.\n")
     except Exception as e:
-        renderer.clear_screen()
-        console.print(f"An unexpected error occurred in The Matrix:", style="bold red", justify="center")
-        console.print(Text(str(e), style="red"), justify="center")
+        if 'renderer' in globals() and renderer and 'console' in globals() and console:
+            renderer.clear_screen()
+            console.print(f"An unexpected error occurred in The Matrix:", style="bold red", justify="center")
+            console.print(Text(str(e), style="red"), justify="center")
+        else:
+            sys.stderr.write(f"\nAn unexpected error occurred in The Matrix: {e}\n")
         # For developer debugging, uncomment below:
         # import traceback
-        # console.print_exception(show_locals=True)
+        # traceback.print_exc() # Prints to stderr
     finally:
-        renderer.clear_screen()
-        console.print("Connection Terminated.", style="dim white", justify="center")
+        if 'renderer' in globals() and renderer: # Ensure renderer was imported
+            renderer.clear_screen()
+        sys.stdout.write("Connection Terminated.\n") # Basic print to ensure it appears
 
 # Ensure a single newline at the end of the file.
