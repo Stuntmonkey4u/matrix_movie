@@ -56,11 +56,8 @@ except ModuleNotFoundError as e_orig:
 
 
 console = renderer.get_console() # Global console instance from renderer
-PAGING_ENABLED = False # Default to False. User will be prompted.
 
 def main():
-    global PAGING_ENABLED # Declare intent to modify the global variable
-
     # Define all scenes to be played in order, along with their estimated durations (for display only)
     # Each tuple: (Display Name, function_to_call, estimated_duration_seconds)
     scenes = [
@@ -77,29 +74,9 @@ def main():
 
     # Initial setup: clear screen, introductory message, and initial code rain.
     renderer.clear_screen()
-    console.print("Preparing The Matrix Experience...", style="bold bright_green", justify="center") # Updated style
+    console.print("Preparing The Matrix Experience...", style="bold green", justify="center")
     time.sleep(1.5)
-    # Initial code rain is played *after* the paging prompt for a cleaner start.
-    # renderer.matrix_code_rain(duration=2, console=console)
-
-    # --- Paging Option Prompt ---
-    renderer.clear_screen() # Clear screen before the prompt
-    console.print("[bold cyan]Paging Option:[/bold cyan]", justify="center")
-    # Using console.input which is part of Rich Console
-    choice = console.input("[bold cyan]Enable manual paging (Press Enter after key moments)? (y/N): [/bold cyan]").strip().lower()
-    if choice == 'y':
-        PAGING_ENABLED = True
-        console.print("Manual paging [bold bright_green]enabled[/bold bright_green]. Press Enter at prompts to continue.", justify="center") # Updated style
-    else:
-        PAGING_ENABLED = False # Explicitly set, though it's the default
-        console.print("Manual paging [bold red]disabled[/bold red]. Movie will play automatically.", justify="center")
-
-    console.print("\nPreparing to start the movie...", justify="center")
-    time.sleep(2.5) # Pause for user to read the confirmation
-
-    # Now, the initial code rain
-    renderer.clear_screen() # Clear the paging prompt before rain
-    renderer.matrix_code_rain(duration=2, console=console) # Initial rain duration
+    renderer.matrix_code_rain(duration=2, console=console) # Adjusted: Initial rain duration to 2 seconds
 
     total_scenes = len(scenes)
     # Calculate and display the estimated total runtime.
@@ -119,38 +96,30 @@ def main():
         console.print(f"(Approx. duration: {scene_duration}s)", style="dim green", justify="center")
         time.sleep(2) # Pause AFTER "Loading Scene" message, before scene starts
 
-        scene_function(PAGING_ENABLED) # Pass PAGING_ENABLED to the scene function
+        scene_function() # Execute the current scene's play_scene() function
 
-        # Inter-scene transition logic (no more inter-scene paging here)
-        if i < total_scenes - 1: # If it's not the last scene
-            time.sleep(0.5) # Small breather after scene finishes, before transition
+        # Add "Press Enter to continue" logic after each scene, except the last one
+        if i < total_scenes - 1: # Only if it's NOT the last scene
+            console.print("\n\n[bold yellow]- - - Press Enter to continue - - -[/bold yellow]", justify="center")
+            input() # Wait for user to press Enter
 
+            # Transition logic starts immediately after Enter is pressed
             renderer.clear_screen()
             console.print(f"Transitioning from {scene_name}...", style="bold dim green", justify="center")
             time.sleep(1) # Keep this brief pause before rain
-            renderer.matrix_code_rain(duration=2, console=console) # Inter-scene rain
+            renderer.matrix_code_rain(duration=2, console=console) # Adjusted: Inter-scene rain duration to 2 seconds
         else:
-            # This is after the last scene (Scene 8).
+            # This is after the last scene (Scene 8)
             # Scene 8 handles its own ending (blinking cursor), so no "Press Enter" here.
             # And no transition rain.
             pass # Scene 8 handles the final blinking cursor, and the movie concludes.
 
     # Final completion messages after all scenes have played.
     renderer.clear_screen()
-    console.print("The Matrix Resurrections: Terminal Movie Experience - Complete.", style="bold bright_green", justify="center") # Updated style
+    console.print("The Matrix Resurrections: Terminal Movie Experience - Complete.", style="bold green", justify="center")
     console.print("Thank you for watching. Reality is what you make it.", style="dim green", justify="center")
     time.sleep(3)
-    # renderer.clear_screen() # Don't clear immediately, credits will do it.
-
-    # --- Credits Screen ---
-    # This is inside the main try block, before except/finally.
-    # renderer and console are guaranteed to be defined if we reached this point
-    # because their import and initialization are at the top of the script or checked early.
     renderer.clear_screen()
-    console.print("\n\n[bold cyan]Created by Stuntmonkey4u[/bold cyan]", justify="center")
-    console.print("[cyan]Https://Github.com/Stuntmonkey4u/matrix_movie[/cyan]", justify="center")
-    console.print("\n\n[bold yellow]- - - Press Enter to exit - - -[/bold yellow]", justify="center")
-    input() # Mandatory pause, regardless of PAGING_ENABLED
 
 if __name__ == '__main__':
     try:

@@ -7,7 +7,7 @@ from utils import renderer # Updated path
 
 console = renderer.get_console()
 
-def play_scene(paging_enabled: bool): # Added paging_enabled argument
+def play_scene():
     renderer.clear_screen()
 
     renderer.typing_print("[ANALYST_AI_CORE] Main process online. Status: NOMINAL.", style="bold cyan", delay=0.03)
@@ -18,7 +18,6 @@ def play_scene(paging_enabled: bool): # Added paging_enabled argument
     # For now, just removing the art and its specific sleep.
     # A small pause might still be good.
     time.sleep(0.5)
-    renderer.conditional_paging_prompt(console, paging_enabled, "Press Enter after Analyst AI online message...")
 
     renderer.typing_print("\n[ANALYST_AI_CORE] Initiating self-diagnostic sequence...", style="cyan", new_line_delay=0.5)
 
@@ -38,7 +37,6 @@ def play_scene(paging_enabled: bool): # Added paging_enabled argument
         time.sleep(random.uniform(0.1, 0.3))
         renderer.typing_print(status, style="bold bright_green" if "PASS" in status or "OK" in status else "bold yellow", delay=type_delay, new_line_delay=0.15, console=console)
     time.sleep(1)
-    renderer.conditional_paging_prompt(console, paging_enabled, "Press Enter after diagnostic sequence...")
 
     renderer.typing_print("\n[ANALYST_AI_CORE] Accessing primary subject profiles...", style="cyan", new_line_delay=0.5, console=console)
 
@@ -97,21 +95,12 @@ def play_scene(paging_enabled: bool): # Added paging_enabled argument
 
         if "Optimal." in log_entry or "Acceptable." in log_entry:
             time.sleep(0.7)
-            # Paging after each subject's profile block
-            if "Acceptable." in log_entry: # Marks end of Trinity's block
-                 renderer.conditional_paging_prompt(console, paging_enabled, "Press Enter after subject profiles...")
 
-    # This part is after the loop, before the final "Coffee break?"
-    renderer.conditional_paging_prompt(console, paging_enabled, "Press Enter before Analyst's final remarks...")
-    time.sleep(1) # Short pause before final remarks, if any, after paging
-
+    time.sleep(2)
     renderer.typing_print("\n[ANALYST_AI_CORE] All systems nominal. Subject parameters within acceptable deviations. Coffee break?", style="bold cyan", delay=0.04, console=console)
     time.sleep(3)
 
 if __name__ == '__main__':
-    # For standalone testing of this scene
-    PAGING_TEST_ENABLED = True
-
     import sys
     import os
     project_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
@@ -124,4 +113,4 @@ if __name__ == '__main__':
     # The specific logic for creating analyst_face.txt for test runs was removed in a previous step.
     # os.makedirs(os.path.join(project_root, "ascii_art"), exist_ok=True)
 
-    play_scene(PAGING_TEST_ENABLED) # Pass the test paging choice
+    play_scene()

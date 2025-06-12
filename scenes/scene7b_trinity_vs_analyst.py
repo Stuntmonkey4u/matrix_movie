@@ -17,7 +17,7 @@ console = renderer.get_console()
 PID_ANALYST = 1 # Assuming Analyst is PID 1
 PID_TRINITY_NEW = 27182 # Consistent PID for Trinity
 
-def play_scene(paging_enabled: bool): # Added paging_enabled argument
+def play_scene():
     renderer.clear_screen()
 
     renderer.typing_print(f"[ANALYST_AI_CORE PID:{PID_ANALYST}] Despite recent... setbacks, I AM STILL IN CONTROL OF THIS MATRIX!", style="bold cyan", delay=0.034)
@@ -34,7 +34,6 @@ def play_scene(paging_enabled: bool): # Added paging_enabled argument
     time.sleep(0.3)
     renderer.typing_print(f"[ANALYST_DEBUG PID:{PID_ANALYST}]   Pain level registered: 10/10. Recalibrating... MAX_PAIN_EXCEEDED.", style="italic red", new_line_delay=0.3, delay=0.034)
     time.sleep(1.0)
-    renderer.conditional_paging_prompt(console, paging_enabled, "Press Enter after Analyst's jaw is shattered...")
 
     renderer.typing_print(f"\n[TRINITY_INSTANCE_2_IO PID:{PID_TRINITY_NEW}] Output to ANALYST_AI_STDIN: 'That was for Neo.'", style="bold magenta", delay=0.034)
     time.sleep(1.5)
@@ -49,14 +48,12 @@ def play_scene(paging_enabled: bool): # Added paging_enabled argument
     time.sleep(0.5)
     renderer.typing_print(f"[ANALYST_SENSORY_FEED PID:{PID_ANALYST}]   Attribute: analyst.jaw. State_Before: shattered. State_After: repaired_but_still_throbbing.", style="red", new_line_delay=0.4, delay=0.034)
     time.sleep(1.0)
-    renderer.conditional_paging_prompt(console, paging_enabled, "Press Enter after Analyst's jaw is repaired...")
 
     renderer.typing_print(f"\n[ANALYST_AI_CORE PID:{PID_ANALYST}] Wha- How dare you! My beautifully rendered, non-corporeal... ARGH!", style="cyan", delay=0.034)
     time.sleep(0.5)
     renderer.typing_print(f"[ANALYST_SENSORY_FEED PID:{PID_ANALYST}] Event: KINETIC_IMPACT_REPEATED. Target: SELF. Attribute: analyst.ego. State_After: bruised_and_deflated.", style="bold red", delay=0.034)
     renderer.typing_print(f"[ANALYST_DEBUG PID:{PID_ANALYST}]   Note to self: Add 'invulnerability_to_righteous_fury' patch. Also, consider a helmet.", style="italic red", new_line_delay=0.3, delay=0.034)
     time.sleep(1.5)
-    renderer.conditional_paging_prompt(console, paging_enabled, "Press Enter after Analyst's ego is bruised...")
 
     renderer.typing_print(f"\n[TRINITY_INSTANCE_2_IO PID:{PID_TRINITY_NEW}] Output to ANALYST_AI_STDIN: 'This Matrix is under new management. Ours.'", style="bold bright_magenta", delay=0.034)
     time.sleep(2.0)
@@ -67,7 +64,6 @@ def play_scene(paging_enabled: bool): # Added paging_enabled argument
 
 if __name__ == '__main__':
     # This allows testing scene7b directly
-    PAGING_TEST_ENABLED = True # Or False
-    play_scene(PAGING_TEST_ENABLED)
+    play_scene()
 
 # Ensure a single newline at the end of the file.

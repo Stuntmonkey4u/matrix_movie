@@ -41,7 +41,7 @@ def generate_corrupted_memory_dump(lines=5, line_length=70):
     dump += "[END_DUMP]\n"
     return dump
 
-def play_scene(paging_enabled: bool): # Added paging_enabled argument
+def play_scene():
     renderer.clear_screen()
 
     renderer.typing_print("[SYSTEM_MONITOR] Unusual process activity detected for Subject #31415 (NEO_INSTANCE_7)...", style="bold yellow", delay=0.03)
@@ -59,13 +59,12 @@ def play_scene(paging_enabled: bool): # Added paging_enabled argument
     time.sleep(1)
     console.print("Injecting patch sequence: [", Text("||||||||||||||||||||", style="grey50"), Text("]", style="white"), end="")
     for _ in range(20):
-        console.print(Text("█", style="bright_green"), end="") # Changed to bright_green
+        console.print(Text("█", style="green"), end="")
         time.sleep(random.uniform(0.05, 0.15))
-    console.print(Text("] PATCH APPLIED.", style="bright_green")) # Changed to bright_green
+    console.print(Text("] PATCH APPLIED.", style="green")) # Removed leading space
     time.sleep(0.5)
     renderer.typing_print("[REALITY_ENGINE] Patch status: PARTIALLY_SUCCESSFUL. Residual instability detected.", style="bold yellow")
     time.sleep(1.5)
-    renderer.conditional_paging_prompt(console, paging_enabled, "Press Enter after patch status...")
 
     renderer.typing_print("\n[SYSTEM_ALERT] High CPU usage on NEO_INSTANCE_7 threads. Possible cognitive loop.", style="bold red", new_line_delay=0.4)
     renderer.typing_print("[DEBUG] Dumping stack trace for thread NEO_PERCEPTION_001:", style="red")
@@ -83,14 +82,13 @@ def play_scene(paging_enabled: bool): # Added paging_enabled argument
     for trace_line in stack_trace:
         style = "red"
         if "WARNING" in trace_line:
-            style = "bold orange1" # Changed from yellow_orange to orange1 for consistency
+            style = "bold yellow" # Simpler color name
         elif "ERROR" in trace_line or "Segmentation Fault" in trace_line:
             style = "bold bright_red"
         elif "CONTEXT" in trace_line:
             style = "italic magenta"
         renderer.typing_print(trace_line, style=style, delay=0.01, new_line_delay=0.1)
     time.sleep(2)
-    renderer.conditional_paging_prompt(console, paging_enabled, "Press Enter after stack trace...")
 
     renderer.typing_print("\n[MEMORY_MANAGER] Corrupted memory blocks detected in NEO_INSTANCE_7's assigned heap.", style="bold red on black", new_line_delay=0.4)
     time.sleep(0.5)
@@ -102,7 +100,6 @@ def play_scene(paging_enabled: bool): # Added paging_enabled argument
     corrupted_dump = generate_corrupted_memory_dump()
     renderer.typing_print(corrupted_dump, style="red", delay=0.005, new_line_delay=0.05)
     time.sleep(1.5)
-    renderer.conditional_paging_prompt(console, paging_enabled, "Press Enter after memory dump...")
 
     renderer.typing_print("[ANALYST_AI_WATCHDOG] Subject #31415 is exhibiting Class-3 dissociative behavior. Not good for business.", style="bold cyan", new_line_delay=0.3)
     renderer.typing_print("[ANALYST_AI_WATCHDOG]   Recommendation: Increase dosage of 'blue_pill_routine_v5.2'.", style="cyan")
@@ -111,5 +108,4 @@ def play_scene(paging_enabled: bool): # Added paging_enabled argument
 
 # Main execution block: Keep it extremely simple.
 if __name__ == "__main__":
-    PAGING_TEST_ENABLED = True # Or False, to test both modes
-    play_scene(PAGING_TEST_ENABLED)
+    play_scene()

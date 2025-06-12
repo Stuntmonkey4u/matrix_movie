@@ -2,11 +2,11 @@ import time
 import os
 import random
 import shutil
-from rich.console import Console # Ensure this is here
+from rich.console import Console
 from rich.text import Text
 from rich.live import Live
 
-DEFAULT_STYLE = "bright_green" # Changed from "bold green"
+DEFAULT_STYLE = "bold green"
 KATAKANA_CHARS = "アイウエオカキクケコサシスセソタチツテトナニヌネノハヒフヘホマミムメモヤユヨラリルレロワヲン"
 ALPHANUMERIC_CHARS = "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789"
 MATRIX_CHARS = KATAKANA_CHARS + ALPHANUMERIC_CHARS
@@ -28,8 +28,13 @@ def typing_print(text: str, delay: float = 0.034, style: str = DEFAULT_STYLE, co
             console.print(Text(char_code, style=style), end="")
             time.sleep(delay)
 
+        # After typing out all characters of 'line':
+        # Always print a newline because each 'line' from text.split('\n')
+        # represents content that was originally followed by a newline, or it's the end of the text.
         console.print()
 
+        # Apply new_line_delay if this is not the very last line segment.
+        # This avoids an extra delay after the absolute final line processed by the loop.
         if i < num_lines - 1:
             time.sleep(new_line_delay)
 
@@ -101,26 +106,19 @@ def matrix_code_rain(duration: float = 7, console=None, refresh_rate: int = 15):
             live.update(current_frame_text)
             time.sleep(1/refresh_rate)
 
-def conditional_paging_prompt(console: Console, paging_enabled: bool, message: str = "- - - Press Enter to continue - - -"):
-    if paging_enabled:
-        if console is None: # Fallback if no Rich console is passed (e.g. very early error)
-            # Basic print and input, no Rich formatting.
-            # Add extra newlines for spacing similar to Rich version.
-            print(f"\n\n{message}\n")
-            input() # Wait for user to press Enter
-            return # Exit the function
-
-        # Use Rich console for formatted output
-        console.print(f"\n\n[bold yellow]{message}[/bold yellow]", justify="center")
-        input() # Wait for user to press Enter
-
 if __name__ == '__main__':
     con = get_console()
 
-    art_dir = os.path.join(os.path.dirname(__file__), "..", "ascii_art")
-    if not os.path.isabs(art_dir):
+    art_dir = os.path.join(os.path.dirname(__file__), "..", "ascii_art") # Adjusted path for test
+    # To run renderer.py directly for testing, it's in utils/, ascii_art is one level up then down.
+    # So, from matrix_movie_project/utils to matrix_movie_project/ascii_art
+    if not os.path.isabs(art_dir): # If not absolute, make it relative to this file's dir
         art_dir = os.path.join(os.path.dirname(__file__), art_dir)
 
+    # Correct path for test_logo.txt relative to renderer.py
+    # renderer.py is in matrix_movie_project/utils/
+    # ascii_art is in matrix_movie_project/ascii_art/
+    # So, path from renderer.py to ascii_art is '../ascii_art'
     art_dir_test_path = os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'ascii_art'))
     test_art_file = os.path.join(art_dir_test_path, "test_logo.txt")
 
@@ -148,17 +146,6 @@ if __name__ == '__main__':
 
     typing_print("\n--- Testing display_ascii_art (typing) ---", console=con, style="bold cyan")
     display_ascii_art(test_art_file, console=con, style="magenta", print_method="typing", typing_delay=0.005, line_delay=0.05)
-    time.sleep(1)
-
-    # Test conditional_paging_prompt
-    typing_print("\n--- Testing conditional_paging_prompt ---", console=con, style="bold cyan")
-    typing_print("Paging DISABLED test (should not wait):", console=con)
-    conditional_paging_prompt(con, False, "Test: Paging Disabled (you should NOT see this prompt wait)")
-    typing_print("Paging DISABLED test complete.", console=con)
-
-    typing_print("\nPaging ENABLED test (will wait for Enter):", console=con)
-    conditional_paging_prompt(con, True, "Test: Paging Enabled (Press Enter to continue)")
-    typing_print("Paging ENABLED test complete (Enter was pressed).", console=con)
     time.sleep(1)
 
     typing_print("\n--- Testing Matrix Code Rain (7 seconds) ---", console=con, style="bold cyan")
