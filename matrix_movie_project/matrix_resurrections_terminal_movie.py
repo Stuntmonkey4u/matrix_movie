@@ -75,7 +75,7 @@ def main():
     renderer.clear_screen()
     console.print("Preparing The Matrix Experience...", style="bold green", justify="center")
     time.sleep(1.5)
-    renderer.matrix_code_rain(duration=15, console=console)
+    renderer.matrix_code_rain(duration=2, console=console) # Adjusted: Initial rain duration to 2 seconds
 
     total_scenes = len(scenes)
     # Calculate and display the estimated total runtime.
@@ -102,7 +102,7 @@ def main():
             renderer.clear_screen()
             console.print(f"Transitioning from {scene_name}...", style="bold dim green", justify="center")
             time.sleep(1) # Keep this brief pause before rain
-            renderer.matrix_code_rain(duration=inter_scene_rain_duration, console=console)
+            renderer.matrix_code_rain(duration=2, console=console) # Adjusted: Inter-scene rain duration to 2 seconds
         else:
             # After the last scene (scene8 already ends with a blinking cursor), no transition needed.
             pass # Scene 8 handles the final blinking cursor, and the movie concludes.
