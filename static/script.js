@@ -345,14 +345,30 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function handleKeydown(e) {
-        if (isPlaying) return; // Prevent navigation while a scene is playing
+        if (isPlaying) return;
 
+        // Special handling for the welcome screen (index 0)
+        if (currentSceneIndex === 0) {
+            if (e.key !== 'ArrowLeft') { // Any key except left arrow advances
+                currentSceneIndex = 1;
+                playRainTransition(2000, () => playScene(currentSceneIndex));
+            }
+            return;
+        }
+
+        // Standard navigation for all other scenes
         if (e.key === 'ArrowRight') {
-            currentSceneIndex = (currentSceneIndex + 1) % scenes.length;
-            playRainTransition(2000, () => playScene(currentSceneIndex));
+            if (currentSceneIndex === scenes.length - 1) { // Last scene
+                window.location.href = '/thanks';
+            } else {
+                currentSceneIndex++;
+                playRainTransition(2000, () => playScene(currentSceneIndex));
+            }
         } else if (e.key === 'ArrowLeft') {
-            currentSceneIndex = (currentSceneIndex - 1 + scenes.length) % scenes.length;
-            playRainTransition(2000, () => playScene(currentSceneIndex));
+            if (currentSceneIndex > 1) { // Don't go back from the first real scene
+                currentSceneIndex--;
+                playRainTransition(2000, () => playScene(currentSceneIndex));
+            }
         }
     }
 
@@ -362,14 +378,14 @@ document.addEventListener('DOMContentLoaded', () => {
             scene_id: "scene0_welcome",
             name: "Welcome",
             lines: [
-                { text: "Welcome, Operator.", style: "bold green", delay: 0.05 },
-                { text: "You have accessed a secured system diagnostic.", style: "green", delay: 0.05, pause: 0.5 },
-                { text: "What you are about to see is a re-creation of events from the perspective of the Matrix itself.", style: "green", delay: 0.05, pause: 1 },
-                { text: "Use the LEFT and RIGHT arrow keys to navigate between scenes.", style: "bold yellow", delay: 0.05, pause: 1.5 },
-                { text: "Press the RIGHT arrow key to begin.", style: "bold yellow", delay: 0.05 }
+                { text: "Welcome to the Matrix 4 Terminal Experience! (Ultra Nerdy Edition)", style: "bold green", delay: 0.05, pause: 0.5 },
+                { text: "You are watching a recreation of the Matrix movie from the perspective of the AI.", style: "green", delay: 0.05, pause: 1 },
+                { text: "Use the RIGHT arrow key to advance to the next scene.", style: "bold yellow", delay: 0.05 },
+                { text: "Use the LEFT arrow key to return to the previous scene.", style: "bold yellow", delay: 0.05, pause: 1.5 },
+                { text: "Press any key to begin...", style: "bold yellow", delay: 0.05 }
             ]
         };
-        scenes.unshift(welcomeScene);
+        scenes.unshift(welcomeScene); // Add welcome scene to the beginning
         playScene(currentSceneIndex);
         document.addEventListener('keydown', handleKeydown);
     }

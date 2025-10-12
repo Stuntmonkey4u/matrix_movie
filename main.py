@@ -13,5 +13,9 @@ def get_scenes():
         scenes = json.load(f)
     return jsonify(scenes)
 
+@app.route('/thanks')
+def thanks():
+    return render_template('thanks.html')
+
 if __name__ == '__main__':
     app.run(debug=True, host='0.0.0.0')
