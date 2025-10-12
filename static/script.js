@@ -407,7 +407,7 @@ document.addEventListener('DOMContentLoaded', () => {
             scene_id: "scene0_welcome",
             name: "Welcome",
             lines: [
-                { text: "Welcome to the Matrix 4 Terminal Experience! (Ultra Nerdy Edition)", style: "bold green", delay: 0.05, pause: 0.5 },
+                { text: "Welcome to The Matrix Resurrections Terminal Experience! (Ultra Nerdy Edition)", style: "bold green", delay: 0.05, pause: 0.5 },
                 { text: "You are watching a recreation of the Matrix movie from the perspective of the AI.", style: "green", delay: 0.05, pause: 1 },
                 { text: "Use the RIGHT arrow key to advance to the next scene.", style: "bold yellow", delay: 0.05 },
                 { text: "Use the LEFT arrow key to return to the previous scene.", style: "bold yellow", delay: 0.05, pause: 1.5 },
