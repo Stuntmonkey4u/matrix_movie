@@ -194,10 +194,10 @@
     "lines": [
       { "text": "[SYSTEM_STATUS] Catastrophic resonance detected between Subject #31415 and Subject #27182.", "delay": 0.04, "style": "bold red on black", "pause": 1.5 },
       { "text": "[SYSTEM_STATUS] Multiple core system failures imminent. Brace for impact.", "delay": 0.04, "style": "bold red", "pause": 1.5 },
-      { "text": "{{kernel_panic}}", "delay": 0, "style": "default", "pause": 3.5, "clear_before": true },
-      { "text": "{{memory_leak}}", "delay": 0, "style": "default", "pause": 3, "clear_before": true },
-      { "text": "{{analyst_panic}}", "delay": 0, "style": "default", "pause": 3, "clear_before": true },
-      { "text": "[SYSTEM_AUTOMATION] Analyst AI offline. Watchdog protocol initiating emergency system reboot...", "delay": 0.05, "style": "bold white on red", "pause": 3, "clear_before": true }
+      { "text": "{{kernel_panic}}", "delay": 0, "style": "default", "pause": 3.5},
+      { "text": "{{memory_leak}}", "delay": 0, "style": "default", "pause": 3},
+      { "text": "{{analyst_panic}}", "delay": 0, "style": "default", "pause": 3},
+      { "text": "[SYSTEM_AUTOMATION] Analyst AI offline. Watchdog protocol initiating emergency system reboot...", "delay": 0.05, "style": "bold white on red", "pause": 3}
     ]
   },
   {
