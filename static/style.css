@@ -148,3 +148,12 @@ body {
 .counter {
     text-align: center;
 }
+
+.briefing {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    align-items: center;
+    height: 100%;
+    text-align: center;
+}

@@ -344,30 +344,59 @@ document.addEventListener('DOMContentLoaded', () => {
         playNextLine();
     }
 
+    function showBriefingScreen(scene, callback) {
+        output.innerHTML = '';
+        const briefing = document.createElement('div');
+        briefing.className = 'briefing';
+        briefing.innerHTML = `
+            <h2 class="bold green">${scene.name}</h2>
+            <p class="green">${scene.description}</p>
+        `;
+        output.appendChild(briefing);
+        setTimeout(callback, 4000); // Show briefing for 4 seconds
+    }
+
+    function showBriefingScreen(scene, callback) {
+        output.innerHTML = '';
+        const briefing = document.createElement('div');
+        briefing.className = 'briefing';
+        briefing.innerHTML = `
+            <h2 class="bold green">${scene.name}</h2>
+            <p class="green">${scene.description}</p>
+        `;
+        output.appendChild(briefing);
+        // Wait for a key press to continue from the briefing
+        document.addEventListener('keydown', function onBriefingKeydown(e) {
+            document.removeEventListener('keydown', onBriefingKeydown);
+            callback();
+        }, { once: true });
+    }
+
     function handleKeydown(e) {
         if (isPlaying) return;
 
-        // Special handling for the welcome screen (index 0)
         if (currentSceneIndex === 0) {
-            if (e.key !== 'ArrowLeft') { // Any key except left arrow advances
-                currentSceneIndex = 1;
-                playRainTransition(2000, () => playScene(currentSceneIndex));
+            if (e.key !== 'ArrowLeft') {
+                playScene(++currentSceneIndex);
             }
             return;
         }
 
-        // Standard navigation for all other scenes
         if (e.key === 'ArrowRight') {
-            if (currentSceneIndex === scenes.length - 1) { // Last scene
+            if (currentSceneIndex >= scenes.length - 1) {
                 window.location.href = '/thanks';
-            } else {
-                currentSceneIndex++;
-                playRainTransition(2000, () => playScene(currentSceneIndex));
+                return;
             }
+            const nextScene = scenes[currentSceneIndex + 1];
+            showBriefingScreen(nextScene, () => {
+                playRainTransition(2000, () => playScene(++currentSceneIndex));
+            });
         } else if (e.key === 'ArrowLeft') {
-            if (currentSceneIndex > 1) { // Don't go back from the first real scene
-                currentSceneIndex--;
-                playRainTransition(2000, () => playScene(currentSceneIndex));
+            if (currentSceneIndex > 1) {
+                const prevScene = scenes[currentSceneIndex - 1];
+                showBriefingScreen(prevScene, () => {
+                     playRainTransition(2000, () => playScene(--currentSceneIndex));
+                });
             }
         }
     }

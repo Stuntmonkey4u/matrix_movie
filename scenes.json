@@ -2,6 +2,7 @@
   {
     "scene_id": "scene1_booting",
     "name": "Booting the New Matrix",
+    "description": "The Matrix Operating System initializes, revealing the new architecture designed by the Analyst.",
     "duration": 45,
     "lines": [
       {
@@ -48,6 +49,7 @@
   {
     "scene_id": "scene2_analyst_ai",
     "name": "Analyst AI Online",
+    "description": "The Analyst AI comes online, running diagnostics and reviewing the status of its primary subjects: Neo and Trinity.",
     "duration": 60,
     "lines": [
       { "text": "[ANALYST_AI_CORE] Main process online. Status: NOMINAL.", "delay": 0.03, "style": "bold cyan", "pause": 1 },
@@ -92,6 +94,7 @@
   {
     "scene_id": "scene3_neo_awakening",
     "name": "Neo’s Awakening Process",
+    "description": "The system detects Neo's growing awareness as a series of glitches, errors, and corrupted memory.",
     "duration": 50,
     "lines": [
       { "text": "[SYSTEM_MONITOR] Unusual process activity detected for Subject #31415 (NEO_INSTANCE_7)...", "delay": 0.03, "style": "bold yellow", "pause": 1.5 },
@@ -123,6 +126,7 @@
   {
     "scene_id": "scene4_mirror_glitch",
     "name": "Mirror Glitch Exception",
+    "description": "A critical physics engine error occurs when Neo interacts with a mirror, causing a kernel panic.",
     "duration": 50,
     "lines": [
       { "text": "[SIMULATION_CORE] Monitoring Subject #31415 (NEO_INSTANCE_7)... Normal parameters.", "delay": 0.02, "style": "green", "pause": 1 },
@@ -150,6 +154,7 @@
   {
     "scene_id": "scene5_trinity_signal",
     "name": "Trinity’s Signal Detected",
+    "description": "The network monitor detects a ghost signal from Trinity's legacy hardware, causing confusion.",
     "duration": 50,
     "lines": [
       { "text": "[NETWORK_MONITOR_AI] Monitoring deep matrix subnet 77 (Modal Residual Zone)...", "delay": 0.025, "style": "bold blue", "pause": 1.5 },
@@ -165,6 +170,7 @@
   {
     "scene_id": "scene6_process_merge",
     "name": "Process Merge: Neo + Trinity",
+    "description": "The system observes high inter-process communication between Neo and Trinity, leading to emergent, unexpected behavior.",
     "duration": 60,
     "lines": [
       { "text": "[KERNEL_SCHEDULER] High inter-process communication detected between PID 31415 (NEO_INSTANCE_7) and PID 27182 (TRINITY_RECOVERY_INSTANCE_1)...", "delay": 0.025, "style": "bold yellow", "pause": 1.5 },
@@ -183,6 +189,7 @@
   {
     "scene_id": "scene7_system_overload",
     "name": "System Overload & Analyst Panic",
+    "description": "The combined resonance of Neo and Trinity causes catastrophic system failures, and the Analyst loses control.",
     "duration": 60,
     "lines": [
       { "text": "[SYSTEM_STATUS] Catastrophic resonance detected between Subject #31415 and Subject #27182.", "delay": 0.04, "style": "bold red on black", "pause": 1.5 },
@@ -196,6 +203,7 @@
   {
     "scene_id": "scene7b_trinity_vs_analyst",
     "name": "Trinity vs. Analyst",
+    "description": "Trinity achieves root access and directly confronts the Analyst, seizing control of the system.",
     "duration": 60,
     "lines": [
       { "text": "[ANALYST_AI_CORE PID:1] Despite recent... setbacks, I AM STILL IN CONTROL OF THIS MATRIX!", "delay": 0.034, "style": "bold cyan", "pause": 1.0 },
@@ -221,6 +229,7 @@
   {
     "scene_id": "scene8_reboot",
     "name": "Reboot and Hope",
+    "description": "The system reboots under new management, with anomalous 'hope' subroutines left intentionally active.",
     "duration": 60,
     "lines": [
       { "text": "[SYSTEM_CORE] Emergency reboot sequence initiated by ANALYST_AI_CORE_WATCHDOG...", "delay": 0.03, "style": "bold red", "pause": 1.5 },
