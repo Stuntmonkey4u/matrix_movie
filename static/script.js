@@ -346,56 +346,50 @@ document.addEventListener('DOMContentLoaded', () => {
 
     function showBriefingScreen(scene, callback) {
         output.innerHTML = '';
+        prompt.classList.add('hidden');
         const briefing = document.createElement('div');
         briefing.className = 'briefing';
         briefing.innerHTML = `
             <h2 class="bold green">${scene.name}</h2>
             <p class="green">${scene.description}</p>
+            <p class="italic yellow" style="margin-top: 2em;">Press any key to continue...</p>
         `;
         output.appendChild(briefing);
-        setTimeout(callback, 4000); // Show briefing for 4 seconds
-    }
 
-    function showBriefingScreen(scene, callback) {
-        output.innerHTML = '';
-        const briefing = document.createElement('div');
-        briefing.className = 'briefing';
-        briefing.innerHTML = `
-            <h2 class="bold green">${scene.name}</h2>
-            <p class="green">${scene.description}</p>
-        `;
-        output.appendChild(briefing);
-        // Wait for a key press to continue from the briefing
-        document.addEventListener('keydown', function onBriefingKeydown(e) {
-            document.removeEventListener('keydown', onBriefingKeydown);
+        // A temporary event listener just for the briefing screen
+        document.addEventListener('keydown', function onBriefingKey(e) {
+            document.removeEventListener('keydown', onBriefingKey);
             callback();
         }, { once: true });
     }
 
     function handleKeydown(e) {
-        if (isPlaying) return;
+        if (isPlaying) return; // Don't navigate while a scene is playing
 
+        // Welcome Screen Logic
         if (currentSceneIndex === 0) {
-            if (e.key !== 'ArrowLeft') {
-                playScene(++currentSceneIndex);
+            if (e.key !== 'ArrowLeft') { // Any key except left arrow starts the movie
+                currentSceneIndex = 1;
+                playRainTransition(2000, () => playScene(currentSceneIndex));
             }
             return;
         }
 
+        // Main Navigation Logic
         if (e.key === 'ArrowRight') {
             if (currentSceneIndex >= scenes.length - 1) {
-                window.location.href = '/thanks';
-                return;
+                window.location.href = '/thanks'; // End of movie
+            } else {
+                showBriefingScreen(scenes[currentSceneIndex + 1], () => {
+                    currentSceneIndex++;
+                    playRainTransition(2000, () => playScene(currentSceneIndex));
+                });
             }
-            const nextScene = scenes[currentSceneIndex + 1];
-            showBriefingScreen(nextScene, () => {
-                playRainTransition(2000, () => playScene(++currentSceneIndex));
-            });
         } else if (e.key === 'ArrowLeft') {
-            if (currentSceneIndex > 1) {
-                const prevScene = scenes[currentSceneIndex - 1];
-                showBriefingScreen(prevScene, () => {
-                     playRainTransition(2000, () => playScene(--currentSceneIndex));
+            if (currentSceneIndex > 1) { // Can't go back from the first scene
+                showBriefingScreen(scenes[currentSceneIndex - 1], () => {
+                    currentSceneIndex--;
+                    playRainTransition(2000, () => playScene(currentSceneIndex));
                 });
             }
         }
@@ -407,7 +401,7 @@ document.addEventListener('DOMContentLoaded', () => {
             scene_id: "scene0_welcome",
             name: "Welcome",
             lines: [
-                { text: "Welcome to The Matrix Resurrections Terminal Experience! (Ultra Nerdy Edition)", style: "bold green", delay: 0.05, pause: 0.5 },
+                { text: "Welcome to the Matrix 4 Terminal Experience! (Ultra Nerdy Edition)", style: "bold green", delay: 0.05, pause: 0.5 },
                 { text: "You are watching a recreation of the Matrix movie from the perspective of the AI.", style: "green", delay: 0.05, pause: 1 },
                 { text: "Use the RIGHT arrow key to advance to the next scene.", style: "bold yellow", delay: 0.05 },
                 { text: "Use the LEFT arrow key to return to the previous scene.", style: "bold yellow", delay: 0.05, pause: 1.5 },
