@@ -358,6 +358,18 @@ document.addEventListener('DOMContentLoaded', () => {
 
     async function init() {
         await fetchScenes();
+        const welcomeScene = {
+            scene_id: "scene0_welcome",
+            name: "Welcome",
+            lines: [
+                { text: "Welcome, Operator.", style: "bold green", delay: 0.05 },
+                { text: "You have accessed a secured system diagnostic.", style: "green", delay: 0.05, pause: 0.5 },
+                { text: "What you are about to see is a re-creation of events from the perspective of the Matrix itself.", style: "green", delay: 0.05, pause: 1 },
+                { text: "Use the LEFT and RIGHT arrow keys to navigate between scenes.", style: "bold yellow", delay: 0.05, pause: 1.5 },
+                { text: "Press the RIGHT arrow key to begin.", style: "bold yellow", delay: 0.05 }
+            ]
+        };
+        scenes.unshift(welcomeScene);
         playScene(currentSceneIndex);
         document.addEventListener('keydown', handleKeydown);
     }

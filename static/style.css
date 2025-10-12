@@ -18,7 +18,8 @@ body {
 
 #terminal {
     padding: 1em;
-    height: calc(100vh - 2em);
+    padding-bottom: 4em; /* Added padding to push content up */
+    height: calc(100vh - 5em); /* Adjusted height */
     overflow-y: auto;
     display: flex;
     flex-direction: column;
@@ -48,11 +49,7 @@ body {
 }
 
 #controls {
-    position: fixed;
-    bottom: 1em;
-    left: 1em;
-    color: #888;
-    font-size: 0.8em;
+    display: none;
 }
 
 .bold { font-weight: bold; }
