@@ -137,3 +137,14 @@ body {
     padding: 0.2em 0.5em;
     text-align: left;
 }
+
+.counters {
+    display: flex;
+    justify-content: center;
+    gap: 2em;
+    margin-top: 2em;
+}
+
+.counter {
+    text-align: center;
+}
