@@ -1,7 +1,6 @@
 from flask import Flask, render_template, jsonify
 import json
 import os
-import fcntl # For file locking
 import threading
 
 app = Flask(__name__)
@@ -13,19 +12,12 @@ def read_counters():
         if not os.path.exists(COUNTER_FILE):
             return {'started': 0, 'finished': 0}
         with open(COUNTER_FILE, 'r') as f:
-            # Advisory lock to prevent race conditions
-            fcntl.flock(f, fcntl.LOCK_SH)
-            counters = json.load(f)
-            fcntl.flock(f, fcntl.LOCK_UN)
-            return counters
+            return json.load(f)
 
 def write_counters(counters):
     with lock:
         with open(COUNTER_FILE, 'w') as f:
-            # Exclusive lock for writing
-            fcntl.flock(f, fcntl.LOCK_EX)
             json.dump(counters, f, indent=4)
-            fcntl.flock(f, fcntl.LOCK_UN)
 
 @app.route('/')
 def index():
