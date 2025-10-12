@@ -1,77 +1,58 @@
-# The Matrix Resurrections: Terminal Movie Experience
+# The Matrix Resurrections: Web Experience
 
-Welcome, Operator. You've accessed a unique system diagnostic: a terminal-based "movie" that reimagines *The Matrix Resurrections* from the perspective of the Matrix system itself. Witness the unfolding events as a series of logs, process traces, AI debug messages, and cryptic system commentary, all within your terminal.
+Welcome, Operator. You've accessed a unique system diagnostic: a web-based "movie" that reimagines *The Matrix Resurrections* from the perspective of the Matrix system itself. Witness the unfolding events as a series of logs, process traces, AI debug messages, and cryptic system commentary, all within your browser.
 
 This project is a nerdy, immersive experience for tech enthusiasts and Matrix fans, designed to simulate a system administrator watching the digital world react to Neo and Trinity's return.
 
 ## Features
 
-*   **Purely Terminal-Based**: No GUIs, just pure text-mode output in a Linux-style terminal.
-*   **Automated Playback**: A non-interactive, timed "movie" that runs for approximately 10-12 minutes.
-*   **Matrix Code Rain**: Iconic green code rain animations at the start and as transitions between scenes.
+*   **Interactive Web Interface**: Experience the movie in a terminal-like interface in your web browser.
+*   **Self-Paced Navigation**: Use the left and right arrow keys to move forward and backward through the scenes at your own pace.
+*   **Animated Scenes**: Each scene remains animated, with typing effects and simulated system processes.
+*   **Matrix Code Rain**: Iconic green code rain animations run in the background.
 *   **System Log Aesthetic**: Output styled to mimic `dmesg`, `journalctl`, `strace`, `tcpdump`, and other familiar Linux tools, but with a Matrix twist.
-*   **Humorous & Cryptic AI Commentary**: Get insights from the Analyst AI and other system processes through their debug logs and internal messages.
-*   **Follows Matrix 4 Plot**: Key plot points of *The Matrix Resurrections* are represented from the machine's viewpoint across 8 distinct scenes.
+*   **Dockerized Environment**: The entire application runs in a Docker container for easy setup and consistent performance.
 
 ## Prerequisites
 
-*   **Python 3**: Ensure you have Python 3 installed (preferably Python 3.7+).
-*   **Rich Library**: The project uses the `rich` Python library for terminal formatting and animations.
-*   A terminal that supports ANSI escape codes and UTF-8 (most modern terminals do).
+*   **Docker**: You must have Docker installed and running on your system. You can download it from the official [Docker website](https://www.docker.com/products/docker-desktop/).
 
-## Installation & Running the Movie
+## Installation & Running the Experience
 
 1.  **Clone the Repository**:
     ```bash
     git clone <repository_url> # Replace <repository_url> with the actual URL
+    cd name_of_cloned_repository
     ```
-    Navigate into the cloned repository directory (e.g., `cd name_of_cloned_repository`).
 
-2.  **Set up a Virtual Environment (Recommended)**:
+2.  **Build the Docker Image**:
+    In the root directory of the project, run the following command to build the Docker image. This will download the necessary dependencies and package the application.
     ```bash
-    python3 -m venv venv
-    source venv/bin/activate  # On Windows: venv\Scripts\activate
+    docker build -t matrix-web .
     ```
 
-3.  **Install Dependencies**:
+3.  **Run the Docker Container**:
+    Once the build is complete, start the web server by running the following command. This will make the application available on port 5000 of your local machine.
     ```bash
-    pip install -r requirements.txt
+    docker run -p 5000:5000 matrix-web
     ```
 
-4.  **Run the Movie**:
-    *   **Using the shell script (recommended for Linux/macOS)**:
-        Make sure your terminal window is maximized for the best experience!
-        ```bash
-        sh run.sh
-        ```
-        If you get a permission error, you might need to make it executable first: `chmod +x run.sh` (though the subtask should have handled this).
-
-    *   **Directly with Python**:
-        Make sure your terminal window is maximized!
-        ```bash
-        python3 matrix_resurrections_terminal_movie.py
-        ```
-        (Or `python matrix_resurrections_terminal_movie.py` if `python3` is not your command for Python 3).
+4.  **Open in Your Browser**:
+    Open your favorite web browser and navigate to:
+    [http://localhost:5000](http://localhost:5000)
 
 5.  **Enjoy the Show!**
-    Press `Ctrl+C` at any time to exit the movie.
+    Use the left and right arrow keys to navigate through the scenes.
 
 ## Project Structure
 
-All scripts and primary directories are now located at the root of the repository:
-
-*   `matrix_resurrections_terminal_movie.py`: The main Python driver script for the movie.
-*   `run.sh`: A shell script for easy launching on Linux/macOS.
-*   `README.md`: This file.
-*   `requirements.txt`: Python dependencies.
-*   `scenes/`: Directory containing individual Python scripts for each movie scene.
-*   `utils/`: Directory containing helper utilities, primarily `renderer.py` for terminal effects.
-*   `ascii_art/`: Directory originally planned for ASCII art; currently holds a `.gitkeep` file as thematic art was removed to enhance the raw terminal feel.
-*   `venv/`: (If created by user following instructions) Directory for the Python virtual environment (typically added to `.gitignore`).
-
-## A Note on Style
-
-This project intentionally avoids complex ASCII art for logos or faces within the movie itself (post initial feedback) to maintain the authentic feel of observing a live terminal feed. The focus is on the text, the timing, and the simulated system environment.
+*   `main.py`: The Flask web server that serves the application.
+*   `Dockerfile`: Defines the Docker container for the application.
+*   `scenes.json`: Contains all the text and animation data for each scene.
+*   `templates/`: Contains the `index.html` file for the main web page.
+*   `static/`: Contains the `style.css` and `script.js` files for the frontend.
+*   `scenes/`: The original Python scene files (kept for reference).
+*   `utils/`: The original Python utility files (kept for reference).
 
 ---
 
