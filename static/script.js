@@ -41,9 +41,26 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    function animateMatrixRain() {
-        drawMatrixRain();
-        animationFrameId = requestAnimationFrame(animateMatrixRain);
+    function playRainTransition(duration, onCompleteCallback) {
+        canvas.style.display = 'block';
+        let start = null;
+        let animationFrameId = null;
+
+        function animationStep(timestamp) {
+            if (!start) start = timestamp;
+            const elapsed = timestamp - start;
+            drawMatrixRain();
+            if (elapsed < duration) {
+                animationFrameId = requestAnimationFrame(animationStep);
+            } else {
+                canvas.style.display = 'none';
+                cancelAnimationFrame(animationFrameId);
+                if (onCompleteCallback) {
+                    onCompleteCallback();
+                }
+            }
+        }
+        animationFrameId = requestAnimationFrame(animationStep);
     }
 
     // Scene playback
@@ -328,18 +345,19 @@ document.addEventListener('DOMContentLoaded', () => {
     }
 
     function handleKeydown(e) {
+        if (isPlaying) return; // Prevent navigation while a scene is playing
+
         if (e.key === 'ArrowRight') {
             currentSceneIndex = (currentSceneIndex + 1) % scenes.length;
-            playScene(currentSceneIndex);
+            playRainTransition(2000, () => playScene(currentSceneIndex));
         } else if (e.key === 'ArrowLeft') {
             currentSceneIndex = (currentSceneIndex - 1 + scenes.length) % scenes.length;
-            playScene(currentSceneIndex);
+            playRainTransition(2000, () => playScene(currentSceneIndex));
         }
     }
 
     async function init() {
         await fetchScenes();
-        animateMatrixRain();
         playScene(currentSceneIndex);
         document.addEventListener('keydown', handleKeydown);
     }
