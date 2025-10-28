@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>The Matrix Resurrections</title>
+    <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+    <canvas id="matrix-rain"></canvas>
+    <div id="terminal">
+        <div id="output"></div>
+        <div id="prompt" class="hidden">> <span>_</span></div>
+    </div>
+    <div id="controls">
+        <p>Use Left/Right arrow keys to navigate scenes</p>
+    </div>
+    <script src="{{ url_for('static', filename='script.js') }}"></script>
+</body>
+</html>
