@@ -46,7 +46,7 @@ This project is a nerdy, immersive experience for tech enthusiasts and Matrix fa
 
 ## Project Structure
 
-*   `main.py`: The Flask web server that serves the application.
+*   `app.py`: The Flask web server that serves the application.
 *   `Dockerfile`: Defines the Docker container for the application.
 *   `scenes.json`: Contains all the text and animation data for each scene.
 *   `counters.json`: Stores the visitor counters.
@@ -59,7 +59,7 @@ This application is designed for a fun, interactive experience. For a production
 
 *   **Use a Production WSGI Server**: The Flask development server (`app.run()`) is not suitable for production. It is recommended to use a production-grade WSGI server like Gunicorn or uWSGI to run the application. You can run the app with Gunicorn using the following command:
     ```bash
-    gunicorn --bind 0.0.0.0:5000 main:app
+    gunicorn --bind 0.0.0.0:5000 app:app
     ```
 *   **File Permissions**: Ensure that the `counters.json` file has the correct write permissions for the user running the web server process.
 
