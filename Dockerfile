@@ -13,11 +13,12 @@ RUN pip install --no-cache-dir -r requirements.txt
 # Copy the rest of the application's code into the container at /app
 COPY . .
 
+# Set environment variables
+ENV PYTHONUNBUFFERED=1
+
 # Make port 5000 available to the world outside this container
 EXPOSE 5000
 
-# Define environment variable
-ENV NAME World
-
-# Run main.py when the container launches
-CMD ["python", "main.py"]
+# Run gunicorn when the container launches
+# Explicitly setting the python path to the current directory
+CMD ["gunicorn", "--bind", "0.0.0.0:5000", "--pythonpath", ".", "app:app"]
