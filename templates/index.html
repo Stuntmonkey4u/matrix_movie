@@ -8,11 +8,18 @@
 </head>
 <body>
     <canvas id="matrix-rain"></canvas>
-    <div id="terminal">
+    <div id="intro-overlay">
+        <div class="intro-content">
+            <h1 class="glitch-text" data-text="THE MATRIX RESURRECTIONS">THE MATRIX RESURRECTIONS</h1>
+            <p>System Diagnostic v7.1.1</p>
+            <button id="start-button">INITIALIZE SYSTEM</button>
+        </div>
+    </div>
+    <div id="terminal" class="hidden">
         <div id="output"></div>
         <div id="prompt" class="hidden">> <span>_</span></div>
     </div>
-    <div id="controls">
+    <div id="controls" class="hidden">
         <p>Use Left/Right arrow keys to navigate scenes</p>
     </div>
     <script src="{{ url_for('static', filename='script.js') }}"></script>
