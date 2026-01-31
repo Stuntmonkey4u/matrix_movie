@@ -3,37 +3,37 @@ document.addEventListener('DOMContentLoaded', () => {
     const prompt = document.getElementById('prompt');
     const canvas = document.getElementById('matrix-rain');
     const ctx = canvas.getContext('2d');
+    const introOverlay = document.getElementById('intro-overlay');
+    const startButton = document.getElementById('start-button');
+    const terminal = document.getElementById('terminal');
+    const controls = document.getElementById('controls');
 
     let scenes = [];
     let currentSceneIndex = 0;
     let isPlaying = false;
-    let animationFrameId;
+    let playbackId = 0; // Increment this to cancel previous async loops
 
-    // Matrix Rain
+    // --- Matrix Rain ---
     canvas.width = window.innerWidth;
     canvas.height = window.innerHeight;
-    const katakana = 'アイウエオカキクケコサシスセソタチツテトナニヌネノハヒフヘホマミムメモヤユヨラリルレロワヲン';
-    const latin = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ';
-    const nums = '0123456789';
-    const alphabet = katakana + latin + nums;
+    const alphabet = 'アイウエオカキクケコサシスセソタチツテトナニヌネノハヒフヘホマミムメモヤユヨラリルレロワヲンABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789';
     const fontSize = 16;
-    const columns = canvas.width / fontSize;
-    const rainDrops = [];
+    let rainDrops = [];
 
-    for (let x = 0; x < columns; x++) {
-        rainDrops[x] = 1;
+    function initRain() {
+        const columns = canvas.width / fontSize;
+        rainDrops = Array(Math.floor(columns)).fill(1);
     }
+    initRain();
 
     function drawMatrixRain() {
         ctx.fillStyle = 'rgba(0, 0, 0, 0.05)';
         ctx.fillRect(0, 0, canvas.width, canvas.height);
         ctx.fillStyle = '#0F0';
         ctx.font = fontSize + 'px monospace';
-
         for (let i = 0; i < rainDrops.length; i++) {
             const text = alphabet.charAt(Math.floor(Math.random() * alphabet.length));
             ctx.fillText(text, i * fontSize, rainDrops[i] * fontSize);
-
             if (rainDrops[i] * fontSize > canvas.height && Math.random() > 0.975) {
                 rainDrops[i] = 0;
             }
@@ -41,377 +41,218 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     }
 
-    function playRainTransition(duration, onCompleteCallback) {
+    let rainAnimationId;
+    function startRain() {
         canvas.style.display = 'block';
-        let start = null;
-        let animationFrameId = null;
-
-        function animationStep(timestamp) {
-            if (!start) start = timestamp;
-            const elapsed = timestamp - start;
+        function animate() {
             drawMatrixRain();
-            if (elapsed < duration) {
-                animationFrameId = requestAnimationFrame(animationStep);
-            } else {
-                canvas.style.display = 'none';
-                cancelAnimationFrame(animationFrameId);
-                if (onCompleteCallback) {
-                    onCompleteCallback();
-                }
-            }
+            rainAnimationId = requestAnimationFrame(animate);
         }
-        animationFrameId = requestAnimationFrame(animationStep);
+        animate();
     }
 
-    // Scene playback
+    function stopRain() {
+        cancelAnimationFrame(rainAnimationId);
+        canvas.style.display = 'none';
+    }
+
+    function playWipe(duration, callback) {
+        startRain();
+        setTimeout(() => {
+            stopRain();
+            if (callback) callback();
+        }, duration);
+    }
+
+    window.addEventListener('resize', () => {
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+        initRain();
+    });
+
+    // --- Core Logic ---
     async function fetchScenes() {
-        const response = await fetch('/scenes');
-        scenes = await response.json();
+        try {
+            const response = await fetch('/scenes');
+            scenes = await response.json();
+        } catch (e) {
+            output.innerHTML = '<div class="red">CRITICAL ERROR: Failed to load reality data.</div>';
+        }
     }
 
-    function generateGlitchText(length) {
-        const chars = "abcdefghijklmnopqrstuvwxyzABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789!@#$%^&*()_+[];',./<>?:{}\\|\"";
-        return Array.from({ length }, () => chars[Math.floor(Math.random() * chars.length)]).join('');
+    function processTemplate(text) {
+        return text.replace(/{{glitch:(\d+)}}/g, (_, len) => {
+            const chars = "!@#$%^&*()_+[];',./<>?:{}\\|\"";
+            return Array.from({ length: parseInt(len) }, () => chars[Math.floor(Math.random() * chars.length)]).join('');
+        }).replace(/{{hex:(\d+)}}/g, (_, len) => {
+            return Array.from({ length: parseInt(len) }, () => "0123456789ABCDEF"[Math.floor(Math.random() * 16)]).join('');
+        }).replace(/{{error_code}}/g, () => `0x${Array.from({length:8}, () => "0123456789ABCDEF"[Math.floor(Math.random()*16)]).join('')}`);
     }
 
-    function generateHex(length) {
-        const chars = "0123456789ABCDEF";
-        return Array.from({ length }, () => chars[Math.floor(Math.random() * chars.length)]).join('');
-    }
-
-    function generateErrorCode() {
-        return `0x${generateHex(8)}-${generateHex(4)}-${generateHex(4)}`;
-    }
-
-    function processLine(line) {
-        let text = line.text;
-        text = text.replace(/{{glitch:(\d+)}}/g, (_, len) => generateGlitchText(parseInt(len)));
-        text = text.replace(/{{hex:(\d+)}}/g, (_, len) => generateHex(parseInt(len)));
-        text = text.replace(/{{error_code}}/g, generateErrorCode);
-        // Add more template replacements here
-        return text;
-    }
-
-    function typeLine(line, callback) {
-        const processedText = processLine(line);
-        let i = 0;
+    async function typeLine(line, myPlaybackId) {
+        const processedText = processTemplate(line.text || "");
         const lineEl = document.createElement('div');
+        if (line.style) lineEl.className = line.style.replace(/_/g, ' ');
+        if (line.no_newline) lineEl.style.display = 'inline';
         output.appendChild(lineEl);
 
-        function typeChar() {
-            if (i < processedText.length) {
-                const char = processedText.charAt(i);
-                const span = document.createElement('span');
-                span.textContent = char;
-                if (line.style) {
-                    span.className = line.style.replace(/on/g, 'on-').replace(/_/g, ' ');
-                }
-                lineEl.appendChild(span);
-                i++;
-                setTimeout(typeChar, line.delay * 1000);
-            } else {
-                if (line.suffix) {
-                    const suffixSpan = document.createElement('span');
-                    suffixSpan.textContent = line.suffix;
-                    if (line.style) {
-                        suffixSpan.className = line.style.replace(/on/g, 'on-').replace(/_/g, ' ');
-                    }
-                    lineEl.appendChild(suffixSpan);
-                }
-
-                if (line.pause) {
-                    setTimeout(callback, line.pause * 1000);
-                } else {
-                    callback();
-                }
-            }
+        for (let char of processedText) {
+            if (myPlaybackId !== playbackId) return; // Interrupted
+            const span = document.createElement('span');
+            span.textContent = char;
+            lineEl.appendChild(span);
+            await new Promise(r => setTimeout(r, (line.delay || 0.03) * 1000));
+            terminal.scrollTop = terminal.scrollHeight;
         }
-        typeChar();
+
+        if (line.suffix) {
+            const suffix = document.createElement('span');
+            suffix.textContent = line.suffix;
+            lineEl.appendChild(suffix);
+        }
+        
+        terminal.scrollTop = terminal.scrollHeight;
+        if (line.pause && myPlaybackId === playbackId) {
+             await new Promise(r => setTimeout(r, line.pause * 1000));
+        }
     }
 
-    function renderLine(line, callback) {
-        if (line.clear_before) {
-            output.innerHTML = '';
-        }
+    async function handleSpecial(line, myPlaybackId) {
+        if (line.clear_before) output.innerHTML = '';
+        if (myPlaybackId !== playbackId) return;
 
         if (line.is_panel) {
             const panel = document.createElement('div');
             panel.className = 'panel ' + (line.panel_border_style || '');
-            const title = document.createElement('div');
-            title.className = 'panel-title';
-            title.textContent = line.panel_title;
-            panel.appendChild(title);
-            const content = document.createElement('div');
-            content.className = 'panel-content ' + (line.style || '');
-            content.textContent = line.text;
-            panel.appendChild(content);
+            panel.innerHTML = `<div class="panel-title">${line.panel_title}</div><div class="panel-content">${line.text}</div>`;
             output.appendChild(panel);
-            if (line.pause) setTimeout(callback, line.pause * 1000);
-            else callback();
-            return;
-        }
-
-        if (line.is_progress) {
+            if (line.pause) await new Promise(r => setTimeout(r, line.pause * 1000));
+        } else if (line.is_progress) {
             const progressWrapper = document.createElement('div');
-            const textSpan = document.createElement('span');
-            textSpan.textContent = line.text;
-            progressWrapper.appendChild(textSpan);
+            progressWrapper.innerHTML = `<span>${line.text}</span> <span class="progress-bar"></span>`;
             output.appendChild(progressWrapper);
-
-            let progress = 0;
-            const progressBar = document.createElement('span');
-            progressWrapper.appendChild(progressBar);
-
-            const interval = setInterval(() => {
-                progressBar.textContent += line.progress_char;
-                progress++;
-                if (progress >= 10) { // Assuming progress is always 10 chars
-                    clearInterval(interval);
-                    if (line.suffix) {
-                        const suffixSpan = document.createElement('span');
-                        suffixSpan.textContent = line.suffix;
-                        progressWrapper.appendChild(suffixSpan);
-                    }
-                    if (line.pause) setTimeout(callback, line.pause * 1000);
-                    else callback();
-                }
-            }, (line.progress_duration * 1000) / 10);
-            return;
-        }
-
-        if (line.text.startsWith('{{')) {
-            const match = line.text.match(/{{(.*?)}}/);
-            if (match) {
-                const [fullMatch, template] = match;
-                const [templateName, ...args] = template.split(':');
-                const handler = templateHandlers[templateName];
-                if (handler) {
-                    handler(args, line, callback);
-                } else {
-                    callback();
-                }
-            } else {
-                callback();
+            const bar = progressWrapper.querySelector('.progress-bar');
+            for (let i = 0; i < 20; i++) {
+                if (myPlaybackId !== playbackId) return;
+                bar.textContent += line.progress_char || '█';
+                await new Promise(r => setTimeout(r, (line.progress_duration || 1) * 50));
             }
-            return;
+            if (line.suffix) progressWrapper.innerHTML += ` <span>${line.suffix}</span>`;
+            if (line.pause) await new Promise(r => setTimeout(r, line.pause * 1000));
+        } else if (line.text && line.text.startsWith('{{')) {
+            const templateMatch = line.text.match(/{{(.*?)}}/);
+            if (templateMatch) {
+                const [name, arg] = templateMatch[1].split(':');
+                if (name === 'flicker') {
+                    for (let i = 0; i < (parseInt(arg) || 3) * 2; i++) {
+                        if (myPlaybackId !== playbackId) return;
+                        terminal.style.backgroundColor = terminal.style.backgroundColor === 'white' ? 'black' : 'white';
+                        await new Promise(r => setTimeout(r, 100));
+                    }
+                    terminal.style.backgroundColor = 'black';
+                } else if (name === 'glitch_block') {
+                    const numLines = parseInt(arg) || 5;
+                    for (let i = 0; i < numLines; i++) {
+                        if (myPlaybackId !== playbackId) return;
+                        const div = document.createElement('div');
+                        div.textContent = Array.from({ length: 50 }, () => "!@#$%^&*()_+[];',./<>?:{}\\|\""[Math.floor(Math.random() * 28)]).join('');
+                        div.className = 'red';
+                        output.appendChild(div);
+                        await new Promise(r => setTimeout(r, 50));
+                    }
+                }
+            }
+        } else {
+            await typeLine(line, myPlaybackId);
         }
-
-
-        typeLine(line, callback);
+        terminal.scrollTop = terminal.scrollHeight;
     }
 
-    const templateHandlers = {
-        glitch_block: (args, line, callback) => {
-            const [num_lines, min_len, max_len] = args.map(Number);
-            for (let i = 0; i < num_lines; i++) {
-                const glitchText = generateGlitchText(Math.floor(Math.random() * (max_len - min_len + 1)) + min_len);
-                const div = document.createElement('div');
-                div.textContent = glitchText;
-                div.className = ['red', 'bright_red', 'yellow'][Math.floor(Math.random() * 3)];
-                output.appendChild(div);
-            }
-            if (line.pause) setTimeout(callback, line.pause * 1000);
-            else callback();
-        },
-        corrupted_dump: (args, line, callback) => {
-            const [lines, line_length] = args.map(Number);
-            const dump = document.createElement('div');
-            dump.className = 'corrupted-dump';
-            let content = `[MEMORY_DUMP_CORRUPTED - ADDRESS: 0x${generateHex(8)}]\n`;
-            for (let i = 0; i < lines; i++) {
-                let lineContent = '';
-                for (let j = 0; j < line_length / 3; j++) {
-                    if (Math.random() > 0.7) {
-                        lineContent += generateHex(2) + ' ';
-                    } else {
-                        lineContent += ['#ERR!', '??', 'xx00', generateGlitchText(2)][Math.floor(Math.random() * 4)] + ' ';
-                    }
-                }
-                content += lineContent.trim() + '\n';
-            }
-            content += '[END_DUMP]\n';
-            dump.textContent = content;
-            output.appendChild(dump);
-            if (line.pause) setTimeout(callback, line.pause * 1000);
-            else callback();
-        },
-        packet_table: (args, line, callback) => {
-            // This is a simplified version. A full implementation would be more complex.
-            const num_packets = parseInt(args[0]);
-            const table = document.createElement('table');
-            table.className = 'packet-table';
-            const header = table.createTHead();
-            const headerRow = header.insertRow();
-            ['Timestamp', 'SRC IP', 'DST IP', 'Protocol', 'Length', 'Info'].forEach(text => {
-                const th = document.createElement('th');
-                th.textContent = text;
-                headerRow.appendChild(th);
-            });
-            const body = table.createTBody();
-            for (let i = 0; i < num_packets; i++) {
-                const row = body.insertRow();
-                row.insertCell().textContent = (Math.random() * 5).toFixed(6);
-                row.insertCell().textContent = `10.77.${Math.floor(Math.random() * 255)}.${Math.floor(Math.random() * 255)}`;
-                row.insertCell().textContent = `10.0.0.1`;
-                row.insertCell().textContent = ['TCP', 'UDP', 'ICMP'][Math.floor(Math.random() * 3)];
-                row.insertCell().textContent = Math.floor(Math.random() * 512);
-                row.insertCell().textContent = generateGlitchText(15);
-            }
-            output.appendChild(table);
-            if (line.pause) setTimeout(callback, line.pause * 1000);
-            else callback();
-        },
-        strace: (args, line, callback) => {
-            const num_lines = parseInt(args[0]);
-            const syscalls = ["sendto", "recvfrom", "futex", "shmget", "shmat", "semop"];
-            for (let i = 0; i < num_lines; i++) {
-                const syscall = syscalls[Math.floor(Math.random() * syscalls.length)];
-                const lineEl = document.createElement('div');
-                lineEl.textContent = `[PID ${Math.floor(Math.random() * 2) === 0 ? 31415 : 27182}] ${syscall}(...) = 0 <${(Math.random() * 0.005).toFixed(4)}>`;
-                lineEl.className = 'strace';
-                output.appendChild(lineEl);
-            }
-            if (line.pause) setTimeout(callback, line.pause * 1000);
-            else callback();
-        },
-        kernel_panic: (args, line, callback) => {
-            const panel = document.createElement('div');
-            panel.className = 'panel bold red on-black';
-            panel.innerHTML = `<div class="panel-title">!!! KERNEL PANIC !!!</div><div class="panel-content white">Unable to mount root fs on unknown-block(0,0)...</div>`;
-            output.appendChild(panel);
-            if (line.pause) setTimeout(callback, line.pause * 1000);
-            else callback();
-        },
-        memory_leak: (args, line, callback) => {
-            const leakReport = document.createElement('div');
-            leakReport.className = 'memory-leak yellow';
-            leakReport.textContent = "[MEM_LEAK_DETECTED] Process 'NEO_TRINITY_MERGE_HANDLER' (PID: 777) leaking 2.5GB/sec.";
-            output.appendChild(leakReport);
-            if (line.pause) setTimeout(callback, line.pause * 1000);
-            else callback();
-        },
-        analyst_panic: (args, line, callback) => {
-            const dialogue = [
-                { speaker: "ANALYST_AI_CORE", text: "RED ALERT! RED ALERT! UNCONTAINED EMOTIONAL CASCADE DETECTED!", style: "bold bright_red" },
-                { speaker: "DEBUG_ANALYST", text: "My elegant, ordered reality... it's turning into a... a ROMCOM?!", style: "italic red on-black" },
-            ];
-            dialogue.forEach(d => {
-                const lineEl = document.createElement('div');
-                lineEl.innerHTML = `<span class="${d.style.replace(/_/g, ' ')}">[${d.speaker}] ${d.text}</span>`;
-                output.appendChild(lineEl);
-            });
-            if (line.pause) setTimeout(callback, line.pause * 1000);
-            else callback();
-        },
-        flicker: (args, line, callback) => {
-            let count = 0;
-            const num_flickers = parseInt(args[0]);
-            const flickerInterval = setInterval(() => {
-                output.style.backgroundColor = output.style.backgroundColor === 'black' ? 'white' : 'black';
-                count++;
-                if (count >= num_flickers * 2) {
-                    clearInterval(flickerInterval);
-                    output.style.backgroundColor = '';
-                    callback();
-                }
-            }, 100);
-        },
-        blinking_cursor: (args, line, callback) => {
-            prompt.classList.remove('hidden');
-            if (line.pause) setTimeout(callback, line.pause * 1000);
-            else callback();
-        }
-    };
-
-    function playScene(sceneIndex) {
-        if (isPlaying) return;
+    async function playScene(index) {
+        playbackId++;
+        const myPlaybackId = playbackId;
         isPlaying = true;
+        currentSceneIndex = index;
+        const scene = scenes[index];
+
         output.innerHTML = '';
         prompt.classList.add('hidden');
-        const scene = scenes[sceneIndex];
-        let lineIndex = 0;
+        
+        // Scene Header / Synopsis
+        await typeLine({ text: `>>> SCENE_${index + 1}: ${scene.name.toUpperCase()}`, style: "bold green", delay: 0.02 }, myPlaybackId);
+        await typeLine({ text: `>>> SYNOPSIS: ${scene.description}`, style: "dim green", delay: 0.01, pause: 0.5 }, myPlaybackId);
+        await typeLine({ text: "---", style: "dim green" }, myPlaybackId);
 
-        function playNextLine() {
-            if (lineIndex < scene.lines.length) {
-                const line = scene.lines[lineIndex];
-                lineIndex++;
-                renderLine(line, playNextLine);
-            } else {
-                isPlaying = false;
-                prompt.classList.remove('hidden');
-            }
+        for (let line of scene.lines) {
+            if (myPlaybackId !== playbackId) return;
+            await handleSpecial(line, myPlaybackId);
         }
-        playNextLine();
+        
+        isPlaying = false;
+        if (myPlaybackId === playbackId) {
+            prompt.classList.remove('hidden');
+        }
     }
 
-    function showBriefingScreen(scene, callback) {
+    async function runBootSequence(e) {
+        if (e && e.target) e.target.blur();
+        playbackId++;
+        const myPlaybackId = playbackId;
+        isPlaying = true;
+        
+        introOverlay.classList.add('hidden');
+        terminal.classList.remove('hidden');
+        controls.classList.remove('hidden');
         output.innerHTML = '';
         prompt.classList.add('hidden');
-        const briefing = document.createElement('div');
-        briefing.className = 'briefing';
-        briefing.innerHTML = `
-            <h2 class="bold green">${scene.name}</h2>
-            <p class="green">${scene.description}</p>
-            <p class="italic yellow" style="margin-top: 2em;">Press any key to continue...</p>
-        `;
-        output.appendChild(briefing);
 
-        // A temporary event listener just for the briefing screen
-        document.addEventListener('keydown', function onBriefingKey(e) {
-            document.removeEventListener('keydown', onBriefingKey);
-            callback();
-        }, { once: true });
-    }
+        const bootLines = [
+            { text: "MARS BIOS v4.0.1", delay: 0.01 },
+            { text: "Check RAM: 1048576KB OK", delay: 0.01 },
+            { text: "Initializing Reality Interface...", delay: 0.02 },
+            { text: "Detecting anomalous signatures...", delay: 0.02 },
+            { text: "Connecting to Zion Mainframe...", delay: 0.05, suffix: " FAILED." },
+            { text: "Retrying via Proxy Node 7...", delay: 0.02, suffix: " SUCCESS." },
+            { text: "Login: operator", delay: 0.05 },
+            { text: "Password: ****************", delay: 0.02 },
+            { text: "Welcome, Operator. System Diagnostic starting...", delay: 0.02, pause: 0.5 }
+        ];
 
-    function handleKeydown(e) {
-        if (isPlaying) return; // Don't navigate while a scene is playing
-
-        // Welcome Screen Logic
-        if (currentSceneIndex === 0) {
-            if (e.key !== 'ArrowLeft') { // Any key except left arrow starts the movie
-                currentSceneIndex = 1;
-                playRainTransition(2000, () => playScene(currentSceneIndex));
-            }
-            return;
+        for (let line of bootLines) {
+            if (myPlaybackId !== playbackId) return;
+            await typeLine(line, myPlaybackId);
         }
 
-        // Main Navigation Logic
-        if (e.key === 'ArrowRight') {
-            if (currentSceneIndex >= scenes.length - 1) {
-                window.location.href = '/thanks'; // End of movie
-            } else {
-                showBriefingScreen(scenes[currentSceneIndex + 1], () => {
-                    currentSceneIndex++;
-                    playRainTransition(2000, () => playScene(currentSceneIndex));
-                });
-            }
-        } else if (e.key === 'ArrowLeft') {
-            if (currentSceneIndex > 1) { // Can't go back from the first scene
-                showBriefingScreen(scenes[currentSceneIndex - 1], () => {
-                    currentSceneIndex--;
-                    playRainTransition(2000, () => playScene(currentSceneIndex));
-                });
-            }
+        isPlaying = false;
+        if (myPlaybackId === playbackId) {
+            currentSceneIndex = 0;
+            playWipe(1000, () => playScene(0));
         }
     }
 
-    async function init() {
-        await fetchScenes();
-        const welcomeScene = {
-            scene_id: "scene0_welcome",
-            name: "Welcome",
-            lines: [
-                { text: "Welcome to the Matrix 4 Terminal Experience! (Ultra Nerdy Edition)", style: "bold green", delay: 0.05, pause: 0.5 },
-                { text: "You are watching a recreation of the Matrix movie from the perspective of the AI.", style: "green", delay: 0.05, pause: 1 },
-                { text: "Use the RIGHT arrow key to advance to the next scene.", style: "bold yellow", delay: 0.05 },
-                { text: "Use the LEFT arrow key to return to the previous scene.", style: "bold yellow", delay: 0.05, pause: 1.5 },
-                { text: "Press any key to begin...", style: "bold yellow", delay: 0.05 }
-            ]
-        };
-        scenes.unshift(welcomeScene); // Add welcome scene to the beginning
-        playScene(currentSceneIndex);
-        document.addEventListener('keydown', handleKeydown);
+    // --- Navigation ---
+    function handleNavigation(e) {
+        if (introOverlay.offsetParent === null) { // Only if not on intro screen
+            if (e.key === 'ArrowRight') {
+                if (currentSceneIndex < scenes.length - 1) {
+                    if (isPlaying) {
+                        currentSceneIndex++;
+                        playWipe(500, () => playScene(currentSceneIndex));
+                    } else {
+                        currentSceneIndex++;
+                        playWipe(500, () => playScene(currentSceneIndex));
+                    }
+                } else if (!isPlaying) {
+                    window.location.href = '/thanks';
+                }
+            } else if (e.key === 'ArrowLeft') {
+                currentSceneIndex = Math.max(0, currentSceneIndex - 1);
+                playWipe(500, () => playScene(currentSceneIndex));
+            }
+        }
     }
 
-    init();
+    startButton.addEventListener('click', runBootSequence);
+    document.addEventListener('keydown', handleNavigation);
+    fetchScenes();
 });
